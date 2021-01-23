@@ -1,6 +1,6 @@
 import pygame
 
-class platform(pygame.sprite.Sprite):
+class collider(pygame.sprite.Sprite):
     color = (255, 255, 255)
 
     def __init__(self, rect, **kwargs):

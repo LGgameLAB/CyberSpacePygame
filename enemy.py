@@ -8,8 +8,9 @@ class enemy(pygame.sprite.Sprite):
     moveType = 0
     color = False
 
-    def __init__(self, image, **kwargs):
-        pygame.sprite.Sprite.__init__(self)
+    def __init__(self, game, image, **kwargs):
+        self.groups = game.sprites, game.enemies
+        pygame.sprite.Sprite.__init__(self, self.groups)
 
         self.image = pygame.image.load(image)
 

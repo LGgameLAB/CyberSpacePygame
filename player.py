@@ -9,22 +9,22 @@ class player(pygame.sprite.Sprite):
     x = 71
     y = 71
     yModMin = -0.1
-    yModMax = 0.1
+    yModMax = 0.4
     roomBound = False
     
     #### Player Initializations ####
     def __init__(self, game, image, name):
-        pygame.sprite.Sprite.__init__(self)
+        self.groups = game.sprites
+        pygame.sprite.Sprite.__init__(self, self.groups)
 
         self.game = game
         self.image = pygame.image.load(image)
         self.rect = pygame.Rect(0, 0, self.image.get_width(), self.image.get_height())
         self.pos = pygame.math.Vector2(self.x, self.y)
         self.dir = pygame.math.Vector2((0, 0))
-        self.vel = 15
+        self.vel = 8
         self.fall = 0
         self.yMod = 0
-        self.colliders = []
         self.ground = False
     
     #### Updates player ####
@@ -34,13 +34,14 @@ class player(pygame.sprite.Sprite):
         self.checkFire()
     
     #### Checks for bullet fire ####
-    def checkFire(self):
+    def checkFire(self):   ## This got complicated so I will break it down
         for event in self.game.events:
-            if event.type == pygame.MOUSEBUTTONUP:
-                mPos = pygame.Vector2(pygame.mouse.get_pos())
-                mPos.x -= self.rect.x
-                mPos.y -= self.rect.y
-                self.game.sprites.add(bullet(self.rect.center, mPos))
+            if event.type == pygame.MOUSEBUTTONUP:  ## Checks on click release
+                mPos = pygame.Vector2(pygame.mouse.get_pos())  ## Gets mouse position and stores it in vector. This will be translated into the vector that moves the bullet
+                pPos = self.game.cam.apply(self)  ## Gets actual position of player on screen
+                mPos.x -= pPos.centerx ## Finds the x and y relativity between the mouse and player and then calculates the offset
+                mPos.y -= pPos.centery
+                bullet(self.game, self.rect.center, mPos) ## Inputs values. Notice how I used rect.center instead of pPos.
 
     #### Move Physics ####
     def move(self):
@@ -143,14 +144,14 @@ class player(pygame.sprite.Sprite):
                     testRect = pygame.Rect(round(vector.x), (vector.y) + x, self.rect.width, self.rect.height)
                 elif colDir == 'd':
                     testRect = pygame.Rect(round(vector.x), round(vector.y) - x, self.rect.width, self.rect.height)
-                for obj in self.colliders:
-                    if testRect.colliderect(obj):
+                for obj in self.game.colliders:
+                    if testRect.colliderect(obj.rect):
                         returnVal = True
                 x += 0.05
         else: 
             testRect = pygame.Rect(round(vector.x), round(vector.y), self.rect.width, self.rect.height)
-            for obj in self.colliders:
-                if testRect.colliderect(obj):
+            for obj in self.game.colliders:
+                if testRect.colliderect(obj.rect):
                     returnVal = True
             
         return returnVal
@@ -160,10 +161,10 @@ class player(pygame.sprite.Sprite):
 class bullet(pygame.sprite.Sprite):
     pos = pygame.Vector2((0,0))
     image = pygame.image.load(asset('bullet_alt.png'))
-    vel = 40
-
-    def __init__(self, pos, target, **kwargs):
-        pygame.sprite.Sprite.__init__(self)
+    vel = 20
+    def __init__(self, game, pos, target, **kwargs):
+        self.groups = game.sprites, game.bullets
+        pygame.sprite.Sprite.__init__(self, self.groups)
 
         for k, v in kwargs.items():
             self.__dict__[k] = v

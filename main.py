@@ -5,8 +5,9 @@ from stgs import *
 from player import *
 from enemy import *
 from camera import *
-from gameObjects import *
+from objects import *
 from levels import *
+
 
 pygame.init()
 
@@ -23,23 +24,23 @@ class game:
     def __init__(self):
         self.enemies = pygame.sprite.Group()
         self.sprites = pygame.sprite.Group()
-        self.platforms = pygame.sprite.Group()
+        self.colliders = pygame.sprite.Group()
         self.bullets = pygame.sprite.Group()
 
         self.win = pygame.display.set_mode((winWidth, winHeight))
 
         self.font1 = pygame.font.SysFont('Comic Sans MS', 20)
-
+        self.loop = 0
         self.gravity = 1
+        self.currentFps = 0
         self.cam = cam(winWidth, winHeight)
-
+        self.clock = pygame.time.Clock()
         self.loadData()
     
     def loadData(self):
         self.levels = gameLevels
         self.player = player(self, asset('Space-ManR.png'), 'Space Man')
         self.player.gravity = self.gravity
-        self.sprites.add(self.player)
 
     ####  Determines how the run will function ####
     def run(self):
@@ -50,29 +51,31 @@ class game:
     def loadLevel(self, levelNum):
         self.level = self.levels[levelNum-1]
         
-        for p in self.level.platforms:
-            self.platforms.add(p)
+        for p in self.level.colliders:
+            self.colliders.add(p)
         
-        platformRects = []
-        for p in self.platforms:
-            platformRects.append(p.rect)
+        colliderRects = []
+        for p in self.colliders:
+            colliderRects.append(p.rect)
         
-        self.player.colliders = platformRects
+        self.player.colliders = colliderRects
         self.cam.width, self.cam.height = self.level.rect.width, self.level.rect.height
 
     #### Main game loop ####
     def mainLoop(self):
         self.loadLevel(1)
+        
         while True:
-            pygame.time.delay(50)
-
+            self.loop += 1
+            self.clock.tick(60)
             self.refresh()
 
             ##Updates Game
             self.runEvents()
             self.update()
 
-    def update(self):
+    def update(self): 
+        self.getFps()
         self.sprites.update()
         self.cam.update(self.player)
         self.win.blit(self.level.image, self.cam.apply(self.level))
@@ -80,11 +83,16 @@ class game:
         for sprite in self.sprites:
             self.win.blit(sprite.image, self.cam.apply(sprite))
 
+        if SHOWFPS:
+            fpsText = self.font1.render(str(self.currentFps), False, (50, 255, 255))
+            self.win.blit(fpsText, (1100, 5))
+            
         ### Checks for bullet collision among enemies and bullets
         hits = pygame.sprite.groupcollide(self.enemies, self.bullets, False, True)
         for hit in hits:
             hit.health -= 5
-  
+        
+        pygame.sprite.groupcollide(self.colliders, self.bullets, False, True)
         pygame.display.update()
 
     def quit(self):
@@ -101,6 +109,18 @@ class game:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     self.quit()
+
+    def getFps(self):
+        if self.loop > 1:
+            if self.loop == 2:
+                self.lastFrame = pygame.time.get_ticks()
+            
+            else:
+                newFrame = pygame.time.get_ticks()
+                self.currentFps = 1/((newFrame-self.lastFrame)/1000) 
+                self.lastFrame = newFrame
+                
+                
 
     #### First menu loop ####
     def menuLoop(self):

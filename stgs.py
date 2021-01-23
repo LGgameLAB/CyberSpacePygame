@@ -7,6 +7,7 @@ ASSETSPATH = os.path.join(PATH, 'assets')
 
 #### Either centers the player no matter what (False) or doesn't scroll over the boundary of the level (True and preferred) ####
 CAMLIMIT = True
+SHOWFPS = True
 
 #### Returns the asset's path ####
 def asset(assetName):

@@ -1,10 +1,10 @@
 import pygame
 from stgs import *
 from enemy import *
-from gameObjects import *
+from objects import *
 
 class level:
-    platforms = []
+    colliders = []
     enemies = []
     levelSize = (winWidth, winHeight)
 
@@ -12,7 +12,7 @@ class level:
         for k, v in kwargs.items():
             self.__dict__[k] = v
         
-        for p in self.platforms:
+        for p in self.colliders:
             if p.rect.bottomright[0] > self.levelSize[0]:
                 self.levelSize = (p.rect.bottomright[0], self.levelSize[1])
             
@@ -22,21 +22,21 @@ class level:
         self.rect = pygame.Rect(0, 0, self.levelSize[0], self.levelSize[1])
         self.image = pygame.Surface(self.levelSize)
 
-        for p in self.platforms:
+        for p in self.colliders:
             self.image.blit(p.image, p.rect)
 
 #### Level creation
 LEVEL1 = level(levelSize = (winWidth, winHeight),
-                platforms = [
-                    platform((200, 200, 150, 10)),
-                    platform((0, winHeight-30, winWidth+1000, 30)),
-                    platform((400, 400, 30, 300)),
-                    platform((0, 0, 30, winHeight)),
-                    platform((winWidth+1000, 0, 30, winHeight)),
-                    platform((0, 0, winWidth, 30)),
+                colliders = [
+                    collider((200, 200, 150, 10)),
+                    collider((0, winHeight-30, winWidth+1000, 30)),
+                    collider((400, 400, 30, 300)),
+                    collider((0, 0, 30, winHeight)),
+                    collider((winWidth+1000, 0, 30, winHeight)),
+                    collider((0, 0, winWidth, 30)),
                     ],
                 enemies = [
-                    enemy(asset('alien.png'))
+                    #enemy(asset('alien.png'))
                     ])
 
 ### All Game levels
