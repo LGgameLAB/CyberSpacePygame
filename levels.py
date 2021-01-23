@@ -1,7 +1,7 @@
 import pygame
 from stgs import *
 from enemy import *
-from platforms import *
+from gameObjects import *
 
 class level:
     platforms = []
@@ -12,8 +12,6 @@ class level:
         for k, v in kwargs.items():
             self.__dict__[k] = v
         
-        
-
         for p in self.platforms:
             if p.rect.bottomright[0] > self.levelSize[0]:
                 self.levelSize = (p.rect.bottomright[0], self.levelSize[1])
@@ -28,8 +26,7 @@ class level:
             self.image.blit(p.image, p.rect)
 
 #### Level creation
-def level1():
-    return level(levelSize = (winWidth, winHeight),
+LEVEL1 = level(levelSize = (winWidth, winHeight),
                 platforms = [
                     platform((200, 200, 150, 10)),
                     platform((0, winHeight-30, winWidth+1000, 30)),
@@ -43,4 +40,4 @@ def level1():
                     ])
 
 ### All Game levels
-gameLevels = [level1()]
+gameLevels = [LEVEL1]

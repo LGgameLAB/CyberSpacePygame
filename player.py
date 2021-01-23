@@ -30,15 +30,17 @@ class player(pygame.sprite.Sprite):
     #### Updates player ####
     def update(self):
         self.move()
-        self.checkFire()
         self.rect.topleft = round(self.pos.x), round(self.pos.y)
+        self.checkFire()
     
     #### Checks for bullet fire ####
     def checkFire(self):
         for event in self.game.events:
             if event.type == pygame.MOUSEBUTTONUP:
-                mPos = pygame.mouse.get_pos()
-                self.game.sprites.add(bullet(self.pos, mPos))
+                mPos = pygame.Vector2(pygame.mouse.get_pos())
+                mPos.x -= self.rect.x
+                mPos.y -= self.rect.y
+                self.game.sprites.add(bullet(self.rect.center, mPos))
 
     #### Move Physics ####
     def move(self):
@@ -61,7 +63,7 @@ class player(pygame.sprite.Sprite):
                 self.dir += rightVec
 
         #### Left movement ####
-        if keys[keySet['pLeft']]:
+        if checkKey(keySet['pLeft']):
             leftVec = pygame.math.Vector2((-1, 0))
             
             if self.collideCheck(self.pos + leftVec*self.vel):
@@ -107,11 +109,11 @@ class player(pygame.sprite.Sprite):
         #### Checks game type for flying or jumping ####
         if platformer:
             if self.ground:
-                if keys[keySet['pUp']]:
+                if checkKey(keySet['pUp']):
                     self.yMod = -0.1 
         else:
             if not roofCollide:
-                if keys[keySet['pUp']]:
+                if checkKey(keySet['pUp']):
                     self.yMod = max(self.yModMin, self.yMod-0.02)
 
         self.dir += (0, self.yMod*self.vel)
@@ -157,7 +159,8 @@ class player(pygame.sprite.Sprite):
 #### Bullet Class ####
 class bullet(pygame.sprite.Sprite):
     pos = pygame.Vector2((0,0))
-    image = pygame.image.load(asset('bullet.png'))
+    image = pygame.image.load(asset('bullet_alt.png'))
+    vel = 40
 
     def __init__(self, pos, target, **kwargs):
         pygame.sprite.Sprite.__init__(self)
@@ -167,11 +170,14 @@ class bullet(pygame.sprite.Sprite):
 
         self.pos = pygame.Vector2(pos)
         self.dir = pygame.Vector2(target).normalize()
-        self.rect = pygame.Rect(self.pos.x, self.pos.y, self.image.get_width(), self.image.get_height())
+        self.rect = pygame.Rect(0, 0, self.image.get_width(), self.image.get_height())
+        self.rect.center = self.pos
+        
+
     
     def update(self):
-        pass
-
-bul = bullet((20, 20), (40,40))
+        self.pos += self.dir *self.vel
+        self.rect.center = self.pos
+        
 
         

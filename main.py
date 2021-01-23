@@ -1,10 +1,11 @@
 import pygame
 import random
+import sys
 from stgs import *
 from player import *
 from enemy import *
 from camera import *
-from platforms import *
+from gameObjects import *
 from levels import *
 
 pygame.init()
@@ -61,31 +62,45 @@ class game:
 
     #### Main game loop ####
     def mainLoop(self):
-
         self.loadLevel(1)
-
-        run = True
-        while run:
+        while True:
             pygame.time.delay(50)
-
-            self.events = pygame.event.get()
-
-            for event in self.events:
-                if event.type == pygame.QUIT:
-                    run = False
 
             self.refresh()
 
-            ##Game functions go here
-            self.sprites.update()
-            self.cam.update(self.player)
+            ##Updates Game
+            self.runEvents()
+            self.update()
 
-            self.win.blit(self.level.image, self.cam.apply(self.level))
+    def update(self):
+        self.sprites.update()
+        self.cam.update(self.player)
+        self.win.blit(self.level.image, self.cam.apply(self.level))
 
-            for sprite in self.sprites:
-                self.win.blit(sprite.image, self.cam.apply(sprite))
-            
-            pygame.display.update()
+        for sprite in self.sprites:
+            self.win.blit(sprite.image, self.cam.apply(sprite))
+
+        ### Checks for bullet collision among enemies and bullets
+        hits = pygame.sprite.groupcollide(self.enemies, self.bullets, False, True)
+        for hit in hits:
+            hit.health -= 5
+  
+        pygame.display.update()
+
+    def quit(self):
+        pygame.quit()
+        sys.exit()
+
+    def runEvents(self):
+        ## Catch all events here
+        self.events = pygame.event.get()
+        for event in self.events:
+            if event.type == pygame.QUIT:
+                self.quit()
+        
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    self.quit()
 
     #### First menu loop ####
     def menuLoop(self):
@@ -94,10 +109,7 @@ class game:
         while run:
             pygame.time.delay(50)
             
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    run = False
-
+            self.runEvents()
             self.refresh()
 
             text1 = self.font1.render('Press S to Start', False, (50, 255, 255))
