@@ -1,4 +1,5 @@
 import pygame
+pygame.init()
 import random
 import sys
 from stgs import *
@@ -7,9 +8,6 @@ from enemy import *
 from camera import *
 from objects import *
 from levels import *
-
-
-pygame.init()
 
 #### Game object ####
 class game:
@@ -29,7 +27,8 @@ class game:
 
         self.win = pygame.display.set_mode((winWidth, winHeight))
 
-        self.font1 = pygame.font.SysFont('Comic Sans MS', 20)
+        self.font1 = pygame.font.SysFont('Comic Sans MS', 25)
+        self.font2 = pygame.font.SysFont('Comic Sans MS', 23)
         self.loop = 0
         self.gravity = 1
         self.currentFps = 0
@@ -50,7 +49,8 @@ class game:
     #### Controls how the levels will load ####
     def loadLevel(self, levelNum):
         self.level = self.levels[levelNum-1]
-        
+        self.level.load()
+    
         for p in self.level.colliders:
             self.colliders.add(p)
         
@@ -84,7 +84,7 @@ class game:
             self.win.blit(sprite.image, self.cam.apply(sprite))
 
         if SHOWFPS:
-            fpsText = self.font1.render(str(self.currentFps), False, (50, 255, 255))
+            fpsText = self.font2.render(str(self.currentFps), True, (255, 255, 255))
             self.win.blit(fpsText, (1100, 5))
             
         ### Checks for bullet collision among enemies and bullets
@@ -132,9 +132,9 @@ class game:
             self.runEvents()
             self.refresh()
 
-            text1 = self.font1.render('Press S to Start', False, (50, 255, 255))
-            text2 = self.font1.render('Welcome to Cyber Space', False, (50, 255, 255))
-            text3 = self.font1.render('Created by Luke Gonsalves', False, (50, 255, 255))
+            text1 = self.font1.render('Press S to Start', True, (50, 255, 255))
+            text2 = self.font1.render('Welcome to Cyber Space', True, (50, 255, 255))
+            text3 = self.font1.render('Created by Luke Gonsalves', True, (50, 255, 255))
             
             self.win.blit(text1, (30,30))
             self.win.blit(text2, (300, 300))

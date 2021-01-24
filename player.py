@@ -8,8 +8,8 @@ from stgs import *
 class player(pygame.sprite.Sprite):
     x = 71
     y = 71
-    yModMin = -0.1
-    yModMax = 0.4
+    yModMin = -0.12
+    yModMax = 0.25
     roomBound = False
     
     #### Player Initializations ####
@@ -111,7 +111,7 @@ class player(pygame.sprite.Sprite):
         if platformer:
             if self.ground:
                 if checkKey(keySet['pUp']):
-                    self.yMod = -0.1 
+                    self.yMod = -0.5 
         else:
             if not roofCollide:
                 if checkKey(keySet['pUp']):
