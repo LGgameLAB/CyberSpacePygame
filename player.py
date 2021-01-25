@@ -3,6 +3,7 @@
 import pygame
 import math
 from stgs import *
+from animations import *
 
 #### Player object ####
 class player(pygame.sprite.Sprite):
@@ -11,21 +12,27 @@ class player(pygame.sprite.Sprite):
     yModMin = -0.12
     yModMax = 0.25
     roomBound = False
-    
+    imgSheet = {'active': False, 'tileWidth': 64, 'r': False, 'l': False, 'rFly': False, 'lFly': False}
+    width, height = 36, 64
     #### Player Initializations ####
-    def __init__(self, game, image, name):
+    def __init__(self, game, image, name, **kwargs):
         self.groups = game.sprites
         pygame.sprite.Sprite.__init__(self, self.groups)
 
         self.game = game
         self.image = pygame.image.load(image)
-        self.rect = pygame.Rect(0, 0, self.image.get_width(), self.image.get_height())
+        self.height = self.image.get_height()
+        self.rect = pygame.Rect(0, 0, self.width, self.height)
         self.pos = pygame.math.Vector2(self.x, self.y)
         self.dir = pygame.math.Vector2((0, 0))
         self.vel = 8
         self.fall = 0
         self.yMod = 0
         self.ground = False
+        self.animations = animation(self)
+        
+        for k, v in kwargs.items():
+            self.__dict__[k] = v
     
     #### Updates player ####
     def update(self):

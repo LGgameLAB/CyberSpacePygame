@@ -32,6 +32,7 @@ class game:
         self.loop = 0
         self.gravity = 1
         self.currentFps = 0
+        self.fullScreen = False
         self.cam = cam(winWidth, winHeight)
         self.clock = pygame.time.Clock()
         self.loadData()
@@ -76,6 +77,7 @@ class game:
 
     def update(self): 
         self.getFps()
+        self.getFullScreen()
         self.sprites.update()
         self.cam.update(self.player)
         self.win.blit(self.level.image, self.cam.apply(self.level))
@@ -120,7 +122,16 @@ class game:
                 self.currentFps = 1/((newFrame-self.lastFrame)/1000) 
                 self.lastFrame = newFrame
                 
-                
+    def getFullScreen(self):
+        keys = pygame.key.get_pressed()
+        if keys[keySet['fullScreen']]:
+            if self.fullScreen:
+                self.win = pygame.display.set_mode((winWidth, winHeight))
+                self.fullScreen = False
+            else:
+                self.win = pygame.display.set_mode((winWidth, winHeight), pygame.FULLSCREEN)
+                self.fullScreen = True
+            #pygame.display.toggle_fullscreen()
 
     #### First menu loop ####
     def menuLoop(self):
