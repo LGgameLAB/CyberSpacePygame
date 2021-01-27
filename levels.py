@@ -7,7 +7,7 @@ from objects import *
 class level:
     rendType = 0
     colliders = []
-    enemies = []
+    enemies = pygame.sprite.Group()
     width = winWidth
     height = winHeight
     levelSize = (width, height)
@@ -19,7 +19,8 @@ class level:
             self.__dict__[k] = v
 
 
-    def load(self):
+    def load(self, game):
+        self.game = game
         if self.rendType == 0:
             for p in self.colliders:
                 if p.rect.bottomright[0] > self.levelSize[0]:
@@ -61,8 +62,10 @@ class level:
             if tile_object.name == 'wall':
                 self.colliders.append(collider((int(tile_object.x), int(tile_object.y), int(tile_object.width), int(tile_object.height))))
 
-            if tile_object.name == 'goblin':
-                pass
+            if tile_object.name == 'enemy':
+                if tile_object.type == 'bit01':
+                    bit01(self.game, (tile_object.x, tile_object.y))
+
 
 #### Level creation
 ## Sample levl

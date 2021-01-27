@@ -5,6 +5,8 @@ import math
 from stgs import *
 from animations import *
 
+def standGun(game, player):
+    return gun(game, asset('alien.png'), player)
 #### Player object ####
 class player(pygame.sprite.Sprite):
     x = 71
@@ -12,8 +14,8 @@ class player(pygame.sprite.Sprite):
     yModMin = -0.12
     yModMax = 0.25
     roomBound = False
-    imgSheet = {'active': False, 'tileWidth': 64, 'r': False, 'l': False, 'rFly': False, 'lFly': False}
-    width, height = 36, 64
+    imgSheet = {'active': False, 'tileWidth': 64, 'r': False, 'l': False, 'idleR': False, 'flyR': False, 'flyL': False}
+    width, height = 48, 64
     #### Player Initializations ####
     def __init__(self, game, image, name, **kwargs):
         self.groups = game.sprites
@@ -21,7 +23,6 @@ class player(pygame.sprite.Sprite):
 
         self.game = game
         self.image = pygame.image.load(image)
-        self.height = self.image.get_height()
         self.rect = pygame.Rect(0, 0, self.width, self.height)
         self.pos = pygame.math.Vector2(self.x, self.y)
         self.dir = pygame.math.Vector2((0, 0))
@@ -29,26 +30,23 @@ class player(pygame.sprite.Sprite):
         self.fall = 0
         self.yMod = 0
         self.ground = False
-        self.animations = animation(self)
-        
+        self.gun = standGun(self.game, self)
+
         for k, v in kwargs.items():
             self.__dict__[k] = v
-    
+        
+        self.loadAnimations()
+
+    def loadAnimations(self):
+        self.animations = animation(self)
+
     #### Updates player ####
     def update(self):
         self.move()
         self.rect.topleft = round(self.pos.x), round(self.pos.y)
-        self.checkFire()
+        self.gun.checkFire()
+        self.animations.update()
     
-    #### Checks for bullet fire ####
-    def checkFire(self):   ## This got complicated so I will break it down
-        for event in self.game.events:
-            if event.type == pygame.MOUSEBUTTONUP:  ## Checks on click release
-                mPos = pygame.Vector2(pygame.mouse.get_pos())  ## Gets mouse position and stores it in vector. This will be translated into the vector that moves the bullet
-                pPos = self.game.cam.apply(self)  ## Gets actual position of player on screen
-                mPos.x -= pPos.centerx ## Finds the x and y relativity between the mouse and player and then calculates the offset
-                mPos.y -= pPos.centery
-                bullet(self.game, self.rect.center, mPos) ## Inputs values. Notice how I used rect.center instead of pPos.
 
     #### Move Physics ####
     def move(self):
@@ -64,9 +62,9 @@ class player(pygame.sprite.Sprite):
                 while not self.collideCheck(self.pos + (x*self.vel, 0)):
                     x += 0.05
                 if x == 0:
-                    self.dir -= (0.01, 0)
+                    self.dir -= (0.00, 0)
                 else:
-                    self.dir += (x-0.5,0)
+                    self.dir += (x-0.05,0)
             else:
                 self.dir += rightVec
 
@@ -163,8 +161,38 @@ class player(pygame.sprite.Sprite):
             
         return returnVal
 
+class gun(pygame.sprite.Sprite):
+    x = 0
+    y = 0
+    rect = pygame.Rect(x, y, 64, 64)
+    def __init__(self, game, image, player, **kwargs):
+        self.groups = game.sprites
+        pygame.sprite.Sprite.__init__(self, self.groups)
 
-#### Bullet Class ####
+        self.game = game
+        self.player = player
+        self.image = image
+        #self.rect = pygame.Rect(0, 0, self.image.get_width(), self.image.get_height())
+        self.pos = pygame.Vector2(self.player.rect.center)
+
+        for k, v in kwargs.items():
+            self.__dict__[k] = v
+    
+    def update(self):
+        self.pos = pygame.Vector2(self.player.rect.center)
+        self.rect.center = self.pos
+
+    #### Checks for bullet fire ####
+    def checkFire(self):   ## This got complicated so I will break it down
+        for event in self.game.events:
+            if event.type == pygame.MOUSEBUTTONUP:  ## Checks on click release
+                mPos = pygame.Vector2(pygame.mouse.get_pos())  ## Gets mouse position and stores it in vector. This will be translated into the vector that moves the bullet
+                pPos = self.game.cam.apply(self.player)  ## Gets actual position of player on screen
+                mPos.x -= pPos.centerx ## Finds the x and y relativity between the mouse and player and then calculates the offset
+                mPos.y -= pPos.centery
+                bullet(self.game, self.rect.center, mPos) ## Inputs values. Notice how I used rect.center instead of pPos.
+
+#### Bullet Class #### 
 class bullet(pygame.sprite.Sprite):
     pos = pygame.Vector2((0,0))
     image = pygame.image.load(asset('bullet_alt.png'))

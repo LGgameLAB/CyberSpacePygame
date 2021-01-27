@@ -26,7 +26,6 @@ class game:
         self.bullets = pygame.sprite.Group()
 
         self.win = pygame.display.set_mode((winWidth, winHeight))
-
         self.font1 = pygame.font.SysFont('Comic Sans MS', 25)
         self.font2 = pygame.font.SysFont('Comic Sans MS', 23)
         self.loop = 0
@@ -39,7 +38,15 @@ class game:
     
     def loadData(self):
         self.levels = gameLevels
-        self.player = player(self, asset('Space-ManR.png'), 'Space Man')
+        self.player = player(self, asset('Space-ManR.png'), 'Space Man', imgSheet = 
+            {'active': True, ## Will become deprecated but is usefulin current development. Allows use of sample image.
+            'tileWidth': 64, 
+            'r': asset('player/idleR.png'), 
+            'l': asset('player/idleL.png'), 
+            'idleR': asset('player/idleR.png'), 
+            'flyR': asset('player/flyR.png'), 
+            'flyL': asset('player/flyL.png')})
+            
         self.player.gravity = self.gravity
 
     ####  Determines how the run will function ####
@@ -50,7 +57,7 @@ class game:
     #### Controls how the levels will load ####
     def loadLevel(self, levelNum):
         self.level = self.levels[levelNum-1]
-        self.level.load()
+        self.level.load(self)
     
         for p in self.level.colliders:
             self.colliders.add(p)
@@ -83,7 +90,10 @@ class game:
         self.win.blit(self.level.image, self.cam.apply(self.level))
 
         for sprite in self.sprites:
-            self.win.blit(sprite.image, self.cam.apply(sprite))
+            try:
+                self.win.blit(sprite.image, self.cam.apply(sprite))
+            except:
+                pass
 
         if SHOWFPS:
             fpsText = self.font2.render(str(self.currentFps), True, (255, 255, 255))

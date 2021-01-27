@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.4" tiledversion="1.4.1" orientation="orthogonal" renderorder="right-down" width="100" height="56" tilewidth="32" tileheight="32" infinite="0" nextlayerid="4" nextobjectid="107">
+<map version="1.4" tiledversion="1.4.1" orientation="orthogonal" renderorder="right-down" width="100" height="56" tilewidth="32" tileheight="32" infinite="0" nextlayerid="4" nextobjectid="111">
  <tileset firstgid="1" source="../cyber_space_tileset1.tsx"/>
  <layer id="2" name="bg" width="100" height="56">
   <data encoding="base64">
@@ -65,5 +65,8 @@
   <object id="104" name="wall" x="2176" y="96" width="32" height="32"/>
   <object id="105" name="wall" x="1792" y="96" width="32" height="32"/>
   <object id="106" name="wall" x="32" y="0" width="3136" height="32"/>
+  <object id="110" name="enemy" type="bit01" x="456" y="912">
+   <point/>
+  </object>
  </objectgroup>
 </map>
