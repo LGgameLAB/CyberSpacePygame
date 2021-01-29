@@ -20,6 +20,7 @@ class level:
 
 
     def load(self, game):
+        self.keyObtained = False
         self.game = game
         if self.rendType == 0:
             for p in self.colliders:
@@ -56,6 +57,12 @@ class level:
                         self.image.blit(tileImage, (x * self.tmxdata.tilewidth, y * self.tmxdata.tileheight))
 
         for tile_object in self.tmxdata.objects:
+            if tile_object.name == 'key':
+                self.key = key1(self.game, (tile_object.x, tile_object.y))
+
+            if tile_object.name == 'door':
+                door(self.game, (tile_object.x, tile_object.y, tile_object.width, tile_object.height))
+                
             if tile_object.name == 'player':
                 self.pStartX, self.pStartY = int(tile_object.x), int(tile_object.y)
 
@@ -65,6 +72,8 @@ class level:
             if tile_object.name == 'enemy':
                 if tile_object.type == 'bit01':
                     bit01(self.game, (tile_object.x, tile_object.y))
+
+            
 
 
 #### Level creation

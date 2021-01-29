@@ -19,6 +19,8 @@ class animation:
                 self.imgSheet[k] = Spritesheet(v)
         
         self.tileWidth = self.imgSheet['tileWidth']
+        self.hasIdle = True 
+        self.hasFly = True
         try:
             self.imgSheet['l']
         except:
@@ -26,7 +28,17 @@ class animation:
         try:
             self.imgSheet['idleL']
         except:
-            self.imgSheet['idleL'] = Spritesheet(pygame.transform.flip(self.imgSheet['idleR'].image, True, False), True)
+            try:
+                self.imgSheet['idleL'] = Spritesheet(pygame.transform.flip(self.imgSheet['idleR'].image, True, False), True)
+            except:
+                self.hasIdle = False
+        try:
+            self.imgSheet['flyL']
+        except:
+            try:
+                self.imgSheet['flyL'] = Spritesheet(pygame.transform.flip(self.imgSheet['flyR'].image, True, False), True)
+            except:
+                self.hasFly = False
         try:
             self.tileHeight = self.imgSheet['tileHeight']
         except:
@@ -58,18 +70,29 @@ class animation:
         else:
             lastDir = self.dir[3]
 
-        if self.sprite.ground:
+        if self.hasFly:
+            if self.sprite.ground:
+                if self.sprite.dir.x > 0:
+                    self.dir = 'r'
+                elif self.sprite.dir.x < 0:
+                    self.dir = 'l'
+                elif self.hasIdle:
+                    self.dir = 'idle' + lastDir.capitalize()
+                else:
+                    self.dir = lastDir.lower()
+            else:
+                if self.sprite.dir.x > 0:
+                    self.dir = 'flyR'
+                elif self.sprite.dir.x < 0:
+                    self.dir = 'flyL'
+                else:
+                    self.dir = 'fly' + lastDir.capitalize()
+        else:
             if self.sprite.dir.x > 0:
                 self.dir = 'r'
             elif self.sprite.dir.x < 0:
                 self.dir = 'l'
-            else:
+            elif self.hasIdle:
                 self.dir = 'idle' + lastDir.capitalize()
-        else:
-            if self.sprite.dir.x > 0:
-                self.dir = 'flyR'
-            elif self.sprite.dir.x < 0:
-                self.dir = 'flyL'
             else:
-                self.dir = 'fly' + lastDir.capitalize()
-        
+                self.dir = lastDir.lower()

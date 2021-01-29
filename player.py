@@ -6,16 +6,19 @@ from stgs import *
 from animations import *
 
 def standGun(game, player):
-    return gun(game, asset('alien.png'), player)
+    return gun(game, asset('alien.png'), player, damage = 2)
 #### Player object ####
 class player(pygame.sprite.Sprite):
     x = 71
     y = 71
     yModMin = -0.12
     yModMax = 0.25
+    hitCooldown = 500
+    lastHit = 0
     roomBound = False
     imgSheet = {'active': False, 'tileWidth': 64, 'r': False, 'l': False, 'idleR': False, 'flyR': False, 'flyL': False}
     width, height = 48, 64
+    health = 50
     #### Player Initializations ####
     def __init__(self, game, image, name, **kwargs):
         self.groups = game.sprites
@@ -44,10 +47,12 @@ class player(pygame.sprite.Sprite):
     def update(self):
         self.move()
         self.rect.topleft = round(self.pos.x), round(self.pos.y)
-        self.gun.checkFire()
         self.animations.update()
     
-
+    def takeDamage(self, damage):
+        if pygame.time.get_ticks() - self.lastHit >= self.hitCooldown:
+            self.health -= damage
+            self.lastHit = pygame.time.get_ticks()
     #### Move Physics ####
     def move(self):
         keys = pygame.key.get_pressed()
@@ -165,6 +170,8 @@ class gun(pygame.sprite.Sprite):
     x = 0
     y = 0
     rect = pygame.Rect(x, y, 64, 64)
+    damage = 5
+    reloadTime = 200
     def __init__(self, game, image, player, **kwargs):
         self.groups = game.sprites
         pygame.sprite.Sprite.__init__(self, self.groups)
@@ -172,6 +179,7 @@ class gun(pygame.sprite.Sprite):
         self.game = game
         self.player = player
         self.image = image
+        self.lastFire = -self.reloadTime
         #self.rect = pygame.Rect(0, 0, self.image.get_width(), self.image.get_height())
         self.pos = pygame.Vector2(self.player.rect.center)
 
@@ -181,6 +189,8 @@ class gun(pygame.sprite.Sprite):
     def update(self):
         self.pos = pygame.Vector2(self.player.rect.center)
         self.rect.center = self.pos
+        if pygame.time.get_ticks() - self.lastFire >= self.reloadTime:
+            self.checkFire()
 
     #### Checks for bullet fire ####
     def checkFire(self):   ## This got complicated so I will break it down
@@ -191,11 +201,12 @@ class gun(pygame.sprite.Sprite):
                 mPos.x -= pPos.centerx ## Finds the x and y relativity between the mouse and player and then calculates the offset
                 mPos.y -= pPos.centery
                 bullet(self.game, self.rect.center, mPos) ## Inputs values. Notice how I used rect.center instead of pPos.
+                self.lastFire = pygame.time.get_ticks()
 
 #### Bullet Class #### 
 class bullet(pygame.sprite.Sprite):
     pos = pygame.Vector2((0,0))
-    image = pygame.image.load(asset('bullet_alt.png'))
+    image = pygame.image.load(asset('objects/bullet_alt.png'))
     vel = 20
     def __init__(self, game, pos, target, **kwargs):
         self.groups = game.sprites, game.bullets

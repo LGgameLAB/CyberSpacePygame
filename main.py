@@ -29,13 +29,14 @@ class game:
         self.font1 = pygame.font.SysFont('Comic Sans MS', 25)
         self.font2 = pygame.font.SysFont('Comic Sans MS', 23)
         self.loop = 0
+        self.points = 0
         self.gravity = 1
         self.currentFps = 0
         self.fullScreen = False
         self.cam = cam(winWidth, winHeight)
         self.clock = pygame.time.Clock()
         self.loadData()
-    
+
     def loadData(self):
         self.levels = gameLevels
         self.player = player(self, asset('Space-ManR.png'), 'Space Man', imgSheet = 
@@ -69,6 +70,11 @@ class game:
         self.player.colliders = colliderRects
         self.cam.width, self.cam.height = self.level.rect.width, self.level.rect.height
 
+        try:
+            self.player.pos.x = self.level.pStartX
+            self.player.pos.y = self.level.pStartY
+        except:
+            pass
     #### Main game loop ####
     def mainLoop(self):
         self.loadLevel(1)
@@ -98,13 +104,27 @@ class game:
         if SHOWFPS:
             fpsText = self.font2.render(str(self.currentFps), True, (255, 255, 255))
             self.win.blit(fpsText, (1100, 5))
+        
+        visPoints = self.font2.render(str(self.points), False, (255, 255, 255))
+        self.win.blit(visPoints, (winWidth/2 - 100, 5))
             
         ### Checks for bullet collision among enemies and bullets
         hits = pygame.sprite.groupcollide(self.enemies, self.bullets, False, True)
         for hit in hits:
-            hit.health -= 5
+            hit.health -= self.player.gun.damage
+            if hit.health <= 0:
+                self.points += hit.points
         
+        hits = pygame.sprite.spritecollide(self.player, self.enemies, False)
+        for hit in hits:
+            self.player.takeDamage(hit.damage)
+
         pygame.sprite.groupcollide(self.colliders, self.bullets, False, True)
+        try:
+            if pygame.sprite.collide_rect(self.player, self.level.key):
+                self.level.keyObtained = True
+        except:
+            pass
         pygame.display.update()
 
     def quit(self):
@@ -120,7 +140,11 @@ class game:
         
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
-                    self.quit()
+                    if self.fullScreen:
+                        self.win = pygame.display.set_mode((winWidth, winHeight))
+                        self.fullScreen = False
+                    else:
+                        self.quit()
 
     def getFps(self):
         if self.loop > 1:
@@ -173,5 +197,4 @@ class game:
 
 #### Creates and runs game ####
 game1 = game()
-print(gameLevels)
 game1.run()
