@@ -22,7 +22,7 @@ winWidth, winHeight = 1200, 700
 keySet = {'start': pygame.K_s, 'pRight': [pygame.K_RIGHT, pygame.K_d], 'pLeft': [pygame.K_LEFT, pygame.K_a], 'pUp': [pygame.K_UP, pygame.K_w], 'fullScreen': pygame.K_f}
 
 #### Changes movement from flying to platforming ####
-platformer = True
+platformer = False
 
 def checkKey(move):
     returnVal = False
