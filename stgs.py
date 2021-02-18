@@ -22,7 +22,7 @@ winWidth, winHeight = 1200, 700
 keySet = {'start': pygame.K_s, 'pRight': [pygame.K_RIGHT, pygame.K_d], 'pLeft': [pygame.K_LEFT, pygame.K_a], 'pUp': [pygame.K_UP, pygame.K_w], 'fullScreen': pygame.K_f}
 
 #### Changes movement from flying to platforming ####
-platformer = False
+platformer = True
 
 def checkKey(move):
     returnVal = False
@@ -54,4 +54,19 @@ class Spritesheet:
         img.blit(self.image, (0, 0), (x, y, width, height))
         img = pygame.transform.scale(img, (width, height))
         return img
+
+class colors:
+    blue = (0, 0, 128)
+    black = (0,0,0)
+    white = (255,255,255)
+    shadow = (192, 192, 192)
+    white = (255, 255, 255)
+    lightGreen = (0, 255, 0)
+    green = (0, 200, 0)
+    blue = (0, 0, 128)
+    lightBlue = (0, 0, 255)
+    red = (200, 0, 0 )
+    lightRed = (255, 100, 100)
+    purple = (102, 0, 102)
+
 

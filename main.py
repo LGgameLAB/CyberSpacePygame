@@ -1,13 +1,16 @@
 import pygame
+import pyperclip
 pygame.init()
 import random
 import sys
+import os
 from stgs import *
 from player import *
 from enemy import *
 from camera import *
 from objects import *
 from levels import *
+from fx import *
 
 #### Game object ####
 class game:
@@ -23,11 +26,18 @@ class game:
         self.enemies = pygame.sprite.Group()
         self.sprites = pygame.sprite.Group()
         self.colliders = pygame.sprite.Group()
-        self.bullets = pygame.sprite.Group()
+        self.pBullets = pygame.sprite.Group()
+        self.items = pygame.sprite.Group()
+        self.layer1 = pygame.sprite.Group()
+        self.layer2 = pygame.sprite.Group()
+        self.fxLayer = pygame.sprite.Group()
+        self.overlayer = pygame.sprite.Group()
+        self.rendLayers = [self.layer1, self.layer2]
 
         self.win = pygame.display.set_mode((winWidth, winHeight))
-        self.font1 = pygame.font.SysFont('Comic Sans MS', 25)
+        self.font1 = pygame.font.SysFont(os.path.join('fonts', 'YuseiMagic-Regular.ttf'), 40)
         self.font2 = pygame.font.SysFont('Comic Sans MS', 23)
+        self.menuFont = pygame.font.SysFont(os.path.join('fonts', 'YuseiMagic-Regular.ttf'), 25)
         self.loop = 0
         self.points = 0
         self.gravity = 1
@@ -56,28 +66,49 @@ class game:
         self.mainLoop()
 
     #### Controls how the levels will load ####
-    def loadLevel(self, levelNum):
-        self.level = self.levels[levelNum-1]
-        self.level.load(self)
-    
-        for p in self.level.colliders:
-            self.colliders.add(p)
-        
-        colliderRects = []
-        for p in self.colliders:
-            colliderRects.append(p.rect)
-        
-        self.player.colliders = colliderRects
-        self.cam.width, self.cam.height = self.level.rect.width, self.level.rect.height
+    def loadLevel(self, levelNum, *args):
+        if len(args) < 1:
+            for enemy in self.enemies:
+                enemy.kill()
+            
+            for sprite in  self.colliders:
+                sprite.kill()
 
-        try:
-            self.player.pos.x = self.level.pStartX
-            self.player.pos.y = self.level.pStartY
-        except:
-            pass
+            self.level = self.levels[levelNum-1] 
+            self.level.load(self)
+
+            colliderRects = []
+            for p in self.colliders:
+                colliderRects.append(p.rect)
+            
+            self.cam.width, self.cam.height = self.level.rect.width, self.level.rect.height
+
+            try:
+                self.player.pos.x = self.level.pStartX
+                self.player.pos.y = self.level.pStartY
+            except:
+                print("No player Pos")
+    
+        else:
+            for enemy in self.enemies:
+                    enemy.kill()
+                
+            for sprite in  self.colliders:
+                sprite.kill()
+
+            self.level = level(rendType=1, mapDir=importLevel(args[0]))
+            self.level.load(self)
+
+            self.cam.width, self.cam.height = self.level.rect.width, self.level.rect.height
+
+            try:
+                self.player.pos.x = self.level.pStartX
+                self.player.pos.y = self.level.pStartY
+            except:
+                print("No player Pos")
+
     #### Main game loop ####
     def mainLoop(self):
-        self.loadLevel(1)
         
         while True:
             self.loop += 1
@@ -93,13 +124,29 @@ class game:
         self.getFullScreen()
         self.sprites.update()
         self.cam.update(self.player)
+        
+        self.render()
+        self.checkHits()
+
+        
+        pygame.display.update()
+
+    def render(self):
         self.win.blit(self.level.image, self.cam.apply(self.level))
 
-        for sprite in self.sprites:
-            try:
-                self.win.blit(sprite.image, self.cam.apply(sprite))
-            except:
-                pass
+        for layer in self.rendLayers:
+            for sprite in layer:
+                try:
+                    self.win.blit(sprite.image, self.cam.apply(sprite))
+                except:
+                    pass
+        
+        for fx in self.fxLayer:
+            self.win.blit(fx.image, fx.rect)
+        
+        for sprite in self.overlayer:
+            self.win.blit(sprite.image, sprite.rect)
+        
 
         if SHOWFPS:
             fpsText = self.font2.render(str(self.currentFps), True, (255, 255, 255))
@@ -107,9 +154,10 @@ class game:
         
         visPoints = self.font2.render(str(self.points), False, (255, 255, 255))
         self.win.blit(visPoints, (winWidth/2 - 100, 5))
-            
+
+    def checkHits(self):
         ### Checks for bullet collision among enemies and bullets
-        hits = pygame.sprite.groupcollide(self.enemies, self.bullets, False, True)
+        hits = pygame.sprite.groupcollide(self.enemies, self.pBullets, False, True)
         for hit in hits:
             hit.health -= self.player.gun.damage
             if hit.health <= 0:
@@ -119,13 +167,32 @@ class game:
         for hit in hits:
             self.player.takeDamage(hit.damage)
 
-        pygame.sprite.groupcollide(self.colliders, self.bullets, False, True)
+        pygame.sprite.groupcollide(self.colliders, self.pBullets, False, True)
+        
+        items = pygame.sprite.spritecollide(self.player, self.items, True)
+        for item in items:
+            if isinstance(item, coin):
+                self.points += item.value
+
+        tpCols = pygame.sprite.spritecollide(self.player, self.level.teleporters, False)
+        for tp in tpCols:
+            fadeOut(self, speed = 20, alpha = 120, fadeBack = True)
+            self.player.pos = tp.target
+
+
+
+        ### DEcryptor/key collision detection
         try:
             if pygame.sprite.collide_rect(self.player, self.level.key):
                 self.level.keyObtained = True
+                self.level.key.kill()
         except:
             pass
-        pygame.display.update()
+        try:
+            if pygame.sprite.collide_rect(self.player, self.level.door) and self.level.keyObtained:
+                self.loadLevel(self.levels.index(self.level) + 2)
+        except:
+            self.run()
 
     def quit(self):
         pygame.quit()
@@ -170,13 +237,27 @@ class game:
     #### First menu loop ####
     def menuLoop(self):
         run = True
-
+        startButton = button(self, (winWidth/2, 140), text="Start", center = True)
+        loadCustomLevelBtn = button(self, (winWidth/2, 100), text="Load Custom Level")
+        buttons = pygame.sprite.Group(startButton, loadCustomLevelBtn)
         while run:
             pygame.time.delay(50)
             
             self.runEvents()
             self.refresh()
 
+            buttons.update()
+            for btn in buttons:
+                self.win.blit(btn.image, btn.rect)
+
+            if startButton.clicked:
+                self.loadLevel(1)
+                break
+            
+            if loadCustomLevelBtn.clicked:
+                self.loadLevel(None, pyperclip.paste())
+                break
+            
             text1 = self.font1.render('Press S to Start', True, (50, 255, 255))
             text2 = self.font1.render('Welcome to Cyber Space', True, (50, 255, 255))
             text3 = self.font1.render('Created by Luke Gonsalves', True, (50, 255, 255))
@@ -188,6 +269,7 @@ class game:
             keys = pygame.key.get_pressed()
 
             if keys[keySet['start']]:
+                self.loadLevel(1)
                 break
             
             pygame.display.update()

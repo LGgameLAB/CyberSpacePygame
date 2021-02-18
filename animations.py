@@ -21,6 +21,7 @@ class animation:
         self.tileWidth = self.imgSheet['tileWidth']
         self.hasIdle = True 
         self.hasFly = True
+
         try:
             self.imgSheet['l']
         except:
@@ -52,8 +53,11 @@ class animation:
             if pygame.time.get_ticks() - self.lastTick >= 120:
                 self.framex += self.tileWidth
                 self.lastTick = pygame.time.get_ticks()
-
-        if self.sprite.imgSheet['active']:
+        try:
+            if self.sprite.imgSheet['active']:
+                self.sprite.image = self.imgSheet[self.dir].get_image(self.framex, 0, self.tileWidth, self.tileHeight)
+                self.sprite.image.set_colorkey((0,0,0))
+        except:
             self.sprite.image = self.imgSheet[self.dir].get_image(self.framex, 0, self.tileWidth, self.tileHeight)
             self.sprite.image.set_colorkey((0,0,0))
                  

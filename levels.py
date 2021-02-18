@@ -7,7 +7,7 @@ from objects import *
 class level:
     rendType = 0
     colliders = []
-    enemies = pygame.sprite.Group()
+    enemies = pygame.sprite.Group() #Deprecated
     width = winWidth
     height = winHeight
     levelSize = (width, height)
@@ -17,7 +17,6 @@ class level:
     def __init__(self, **kwargs):
         for k, v in kwargs.items():
             self.__dict__[k] = v
-
 
     def load(self, game):
         self.keyObtained = False
@@ -40,7 +39,7 @@ class level:
             self.loadTiled()
     
     def loadTiled(self): # Map needs to be specified
-        self.tmxdata = pytmx.load_pygame(asset(self.mapDir), pixelalpha=True)
+        self.tmxdata = pytmx.load_pygame(self.mapDir, pixelalpha=True)
         self.width = self.tmxdata.width * self.tmxdata.tilewidth
         self.height = self.tmxdata.height * self.tmxdata.tileheight
         self.levelSize = (self.width, self.height)
@@ -56,50 +55,123 @@ class level:
                         tileImage
                         self.image.blit(tileImage, (x * self.tmxdata.tilewidth, y * self.tmxdata.tileheight))
 
+        self.teleporters = pygame.sprite.Group()
+
         for tile_object in self.tmxdata.objects:
             if tile_object.name == 'key':
                 self.key = key1(self.game, (tile_object.x, tile_object.y))
 
             if tile_object.name == 'door':
-                door(self.game, (tile_object.x, tile_object.y, tile_object.width, tile_object.height))
+                self.door = door(self.game, (tile_object.x, tile_object.y, tile_object.width, tile_object.height))
                 
-            if tile_object.name == 'player':
-                self.pStartX, self.pStartY = int(tile_object.x), int(tile_object.y)
+            if tile_object.name == 'Player':
+                self.pStartX = int(tile_object.x)
+                self.pStartY = int(tile_object.y)
 
             if tile_object.name == 'wall':
-                self.colliders.append(collider((int(tile_object.x), int(tile_object.y), int(tile_object.width), int(tile_object.height))))
+                collider(self.game, (int(tile_object.x), int(tile_object.y), int(tile_object.width), int(tile_object.height)))
 
             if tile_object.name == 'enemy':
                 if tile_object.type == 'bit01':
-                    bit01(self.game, (tile_object.x, tile_object.y))
+                    try:
+                        if tile_object.vertical:
+                            bit01(self.game, (tile_object.x, tile_object.y), True)
+                        else:
+                            bit01(self.game, (tile_object.x, tile_object.y), False)
+                    except:
+                            bit01(self.game, (tile_object.x, tile_object.y), False)
 
+                if tile_object.type == 'bit02':
+                    bit02(self.game, (tile_object.x, tile_object.y))
+                
+            if tile_object.name == 'coin':
+                if tile_object.type == 'bit':
+                    bitCoin(self.game, (tile_object.x, tile_object.y))
+            
+            if tile_object.name == 'teleporter':
+                if tile_object.type == 'tp1':
+                    for obj in self.tmxdata.objects:
+                        if obj.id == 14:
+                            target = obj
+                    self.teleporters.add(tp1(self.game, (tile_object.x, tile_object.y), target))
+
+## Handles loading a level from a Cyberspace website link
+import requests
+from zipfile import ZipFile
+
+def importLevel(link):
+    unZipPath = asset('custom/import')
+    for file in os.listdir(unZipPath):
+         os.remove(os.path.join(unZipPath, file))
+    
+    for file in os.listdir(asset('custom/')):
+        try:
+            os.remove(asset('custom/' + file))
+        except:
+            pass
+
+    try:
+        req = requests.get(link.split()[0], allow_redirects=True)
+    except:
+        try:
+            req = requests.get("https://cyberspace-media.s3.amazonaws.com/maps/" + link.split()[0], allow_redirects=True)
+        except:
+            print("Not a link")
+            return
+    
+    if not req.status_code == 403:
+            
+            # Gets the zip file from s3 and downloads it into the unzips folder with the title as the name
+            zipPath = os.path.join(unZipPath, 'import.zip')
+            open(zipPath, 'wb').write(req.content)
+
+            with ZipFile(zipPath, 'r') as zipObj:
+                zipObj.extractall(path=unZipPath)
+            
+            for file in os.listdir(unZipPath):
+                if file.endswith(".tmx"):
+                    tmxFile = os.path.join(unZipPath, file)
+                else:
+                    os.replace(os.path.join(unZipPath, file), asset('custom/' + file))
+            
+            return tmxFile
+
+    else:
+        print("map does not exist")
+        return
             
 
 
 #### Level creation
 ## Sample levl
-LEVEL1 = level(
-    levelSize = (winWidth, winHeight),
-    colliders = [
-        collider((200, 200, 150, 10)),
-        collider((0, winHeight-30, winWidth+1000, 30)),
-        collider((400, 400, 30, 300)),
-        collider((0, 0, 30, winHeight)),
-        collider((winWidth+1000, 0, 30, winHeight)),
-        collider((0, 0, winWidth, 30)),
-        ],
-    enemies = [
-        #enemy(asset('alien.png'))
-        ],
-    rendType = 0
-)
+# LEVEL1 = level(
+#     levelSize = (winWidth, winHeight),
+#     colliders = [
+#         collider((200, 200, 150, 10)),
+#         collider((0, winHeight-30, winWidth+1000, 30)),
+#         collider((400, 400, 30, 300)),
+#         collider((0, 0, 30, winHeight)),
+#         collider((winWidth+1000, 0, 30, winHeight)),
+#         collider((0, 0, winWidth, 30)),
+#         ],
+#     enemies = [
+#         #enemy(asset('alien.png'))
+#         ],
+#     rendType = 0
+# )
 
 ## Remember to include tileset image and tsx file with the tmx file of the map
 level1 = level(
     rendType = 1,
-    mapDir = 'Tiled/level1/level1.tmx'
+    mapDir = asset('Tiled/level1/level1.tmx')
 )
-    
-
+level2 = level(
+    rendType = 1,
+    mapDir = asset('Tiled/level2/level2.tmx')
+)
+level3 = level(
+    rendType = 1,
+    mapDir = asset('Tiled/level3/level3.tmx')
+)
 ### All Game levels
-gameLevels = [level1]
+gameLevels = [level1, level2, level3,]
