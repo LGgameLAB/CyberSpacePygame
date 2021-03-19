@@ -84,16 +84,30 @@ class level:
                 if tile_object.type == 'bit02':
                     bit02(self.game, (tile_object.x, tile_object.y))
                 
-            if tile_object.name == 'coin':
-                if tile_object.type == 'bit':
+                if tile_object.type == 'bossyBit':
+                    bossyBit(self.game, (tile_object.x, tile_object.y))
+                
+            
+            if tile_object.name == 'consumable':
+                if tile_object.type == 'massFireGun':
+                    massFireGunConsumable(self.game, (tile_object.x, tile_object.y))
+                if tile_object.type == 'tripleGun':  
+                    tripleGunConsumable(self.game, (tile_object.x, tile_object.y))
+                elif tile_object.type == 'hpPack1':
+                    hpPack1(self.game, (tile_object.x, tile_object.y))
+                elif tile_object.type == 'coinBit':
                     bitCoin(self.game, (tile_object.x, tile_object.y))
             
             if tile_object.name == 'teleporter':
                 if tile_object.type == 'tp1':
                     for obj in self.tmxdata.objects:
-                        if obj.id == 14:
+                        if obj.id == tile_object.target:
                             target = obj
                     self.teleporters.add(tp1(self.game, (tile_object.x, tile_object.y), target))
+            
+            if tile_object.name == 'text':
+                text = fonts['3'].render(tile_object.text, True, (255, 255, 255))
+                self.image.blit(text, (tile_object.x, tile_object.y))
 
 ## Handles loading a level from a Cyberspace website link
 import requests
@@ -163,7 +177,7 @@ def importLevel(link):
 ## Remember to include tileset image and tsx file with the tmx file of the map
 level1 = level(
     rendType = 1,
-    mapDir = asset('Tiled/level1/level1.tmx')
+    mapDir = asset('Tiled/level1/level1(2).tmx')
 )
 level2 = level(
     rendType = 1,
@@ -174,4 +188,4 @@ level3 = level(
     mapDir = asset('Tiled/level3/level3.tmx')
 )
 ### All Game levels
-gameLevels = [level1, level2, level3,]
+gameLevels = [level1, level2, level3, ]

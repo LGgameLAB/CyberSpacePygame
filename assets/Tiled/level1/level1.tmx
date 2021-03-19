@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.4" tiledversion="1.4.1" orientation="orthogonal" renderorder="right-down" width="100" height="56" tilewidth="32" tileheight="32" infinite="0" nextlayerid="4" nextobjectid="152">
+<map version="1.4" tiledversion="1.4.1" orientation="orthogonal" renderorder="right-down" width="100" height="56" tilewidth="32" tileheight="32" infinite="0" nextlayerid="4" nextobjectid="153">
  <tileset firstgid="1" source="../cyber_space_tileset1.tsx"/>
  <layer id="2" name="bg" width="100" height="56">
   <data encoding="base64">
@@ -174,5 +174,6 @@
   <object id="149" name="wall" x="160" y="1632" width="192" height="32"/>
   <object id="150" name="coin" type="bit" x="2824" y="328" width="24" height="24"/>
   <object id="151" x="1736" y="-64"/>
+  <object id="152" name="consumable" type="massFireGun" x="2912" y="104" width="24" height="24"/>
  </objectgroup>
 </map>

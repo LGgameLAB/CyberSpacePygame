@@ -5,8 +5,6 @@ import math
 from stgs import *
 from animations import *
 
-def standGun(game, player):
-    return gun(game, asset('objects/gun.png'), player, damage = 2)
 #### Player object ####
 class player(pygame.sprite.Sprite):
     x = 71
@@ -34,7 +32,7 @@ class player(pygame.sprite.Sprite):
         self.fall = 0
         self.yMod = 0
         self.ground = False
-        self.gun = standGun(self.game, self)
+        self.gun = standardGun(self.game, self)
 
         for k, v in kwargs.items():
             self.__dict__[k] = v
@@ -204,14 +202,15 @@ class gun(pygame.sprite.Sprite):
             if event.type == pygame.MOUSEBUTTONUP:  ## Checks on click release
                 mPos = pygame.Vector2(pygame.mouse.get_pos())  ## Gets mouse position and stores it in vector. This will be translated into the vector that moves the bullet
                 pPos = self.game.cam.apply(self.player)  ## Gets actual position of player on screen
-                pPosVec = pygame.Vector2((pPos.x, pPos.y))
-                angle = pPosVec.angle_to(mPos) ## Gets angle between player vector and mouse vector
                 mPos.x -= pPos.centerx ## Finds the x and y relativity between the mouse and player and then calculates the offset
                 mPos.y -= pPos.centery
                 self.setAngle(False)
-                bullet(self.game, self.rect.center, mPos, self.angle) ## Inputs values. Notice how I used rect.center instead of pPos.
+                self.fire(mPos) ## Inputs values. Notice how I used rect.center instead of pPos.
                 self.lastFire = pygame.time.get_ticks()
     
+    def fire(self, mPos):
+        bullet(self.game, self.rect.center, mPos, self.angle)
+
     def setAngle(self, *args):
         if len(args) > 0:
             move = args[0]
@@ -244,20 +243,52 @@ class gun(pygame.sprite.Sprite):
         self.image = pygame.transform.rotate(self.imgSource, angle)
         self.rect = self.image.get_rect(center = self.image.get_rect(center = self.rect.center).center)
 
+class massFireGun(gun):
+    def __init__(self, game, player):
+        super().__init__(game, asset('objects/gun.png'), player, damage = 2)
     
+    def fire(self, mPos):
+        bullet(self.game, self.rect.center, mPos, self.angle, offset = 180)
+        bullet(self.game, self.rect.center, mPos, self.angle, offset = 90)
+        bullet(self.game, self.rect.center, mPos, self.angle, offset = 5)
+        bullet(self.game, self.rect.center, mPos, self.angle, offset = 2.5)
+        bullet(self.game, self.rect.center, mPos, self.angle)
+        bullet(self.game, self.rect.center, mPos, self.angle, offset = -2.5)
+        bullet(self.game, self.rect.center, mPos, self.angle, offset = -5)
+        bullet(self.game, self.rect.center, mPos, self.angle, offset = -90)
 
-    
+class tripleGun(gun):
 
+    def __init__(self, game, player):
+        super().__init__(game, asset('objects/gun.png'), player, damage = 2)
 
+    def fire(self, mPos):
+        bullet(self.game, self.rect.center, mPos, self.angle, offset = 5)
+        bullet(self.game, self.rect.center, mPos, self.angle)
+        bullet(self.game, self.rect.center, mPos, self.angle, offset = -5)
 
+class lazerGun(gun):
+
+    def __init__(self, game, player):
+        super().__init__(game, asset('objects/gun.png'), player, damage = 1)
+
+    def fire(self, mPos):
+        lazer(self.game, self.rect.center, mPos, self.angle)
+
+class standardGun(gun):
+    def __init__(self, game, player):
+        super().__init__(game, asset('objects/gun.png'), player, damage = 2)
 
 #### Bullet Class #### 
 class bullet(pygame.sprite.Sprite):
     pos = pygame.Vector2((0,0))
     image = pygame.image.load(asset('objects/bullet2.png'))
     vel = 20
+    offset = 0
+    static = False
     def __init__(self, game, pos, target, angle, **kwargs):
         self.groups = game.sprites, game.pBullets, game.layer2
+        self.game = game
         pygame.sprite.Sprite.__init__(self, self.groups)
 
         for k, v in kwargs.items():
@@ -265,15 +296,15 @@ class bullet(pygame.sprite.Sprite):
 
         self.pos = pygame.Vector2(pos)
         self.dir = pygame.Vector2(target).normalize()
-        self.image = pygame.transform.rotate(self.image, angle)
+        self.dir = self.dir.rotate(self.offset)
+        self.image = pygame.transform.rotate(self.image, angle - self.offset)
         self.rect = pygame.Rect(0, 0, self.image.get_width(), self.image.get_height())
         self.rect.center = self.pos
-        
-
     
     def update(self):
-        self.pos += self.dir *self.vel
-        self.rect.center = self.pos
+        if not self.static:
+            self.pos += self.dir *self.vel
+            self.rect.center = self.pos
 
 class healthBar(pygame.sprite.Sprite):
     x = winWidth/3
@@ -298,3 +329,48 @@ class healthBar(pygame.sprite.Sprite):
     def update(self):
         self.image.fill((self.bgColor))
         pygame.draw.rect(self.image, self.hpColor, (1, 1, (self.width - 2)*(self.player.health/self.player.maxHp), self.height -2))
+
+class lazer(bullet):
+    def __init__(self, game, pos, target, angle):
+        self.limit = 40
+        self.colAcc = 9 # collision accuracy
+        self.beamWidth = 5
+        self.pPos = pos
+        self.lazers = []
+        self.angle = angle
+        self.initTime = pygame.time.get_ticks()
+        super().__init__(game, pos, target, angle, static=True)
+        self.render()
+    
+    def render(self):
+        x = 0
+        checkPos = self.pos
+        checkDir = self.dir*self.colAcc
+        checkRect = self.rect
+        while x < self.limit:
+            x+=1
+            checkPos += checkDir
+            checkRect.center = checkPos
+            self.lazers.append(bullet(self.game, checkPos, checkPos, self.angle, static=True, image=pygame.image.load(asset('objects/lazer.png'))))
+            if self.checkCol(checkRect):
+                break
+
+        self.finalPoint = checkPos
+        self.pos = self.finalPoint
+        self.rect = (self.pos.x, self.pos.y, self.beamWidth, self.beamWidth)
+    
+    def checkCol(self, rect):
+        returnVal = False
+        for obj in self.game.colliders:
+            if rect.colliderect(obj.rect):
+                returnVal = True
+        return returnVal
+    
+    def update(self):
+        super().update()
+        print(pygame.time.get_ticks() - self.initTime)
+        if pygame.time.get_ticks() - self.initTime >= 200:
+            for l in self.lazers:
+                l.kill()
+            self.kill()
+        

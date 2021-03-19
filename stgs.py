@@ -55,6 +55,10 @@ class Spritesheet:
         img = pygame.transform.scale(img, (width, height))
         return img
 
+fonts = {'1': pygame.font.Font(os.path.join('fonts', 'YuseiMagic-Regular.ttf'), 40),
+        '2': pygame.font.SysFont('Comic Sans MS', 23),
+        '3': pygame.font.Font(os.path.join('fonts', 'PottaOne-Regular.ttf'), 32),}
+
 class colors:
     blue = (0, 0, 128)
     black = (0,0,0)

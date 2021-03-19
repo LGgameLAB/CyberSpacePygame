@@ -1,6 +1,7 @@
 import pygame
 from stgs import *
 from animations import *
+from player import *
 
 class collider(pygame.sprite.Sprite):
     color = (255, 255, 255)
@@ -117,7 +118,6 @@ class button(pygame.sprite.Sprite):
         else:
             self.textRect.x += 2
             self.textRect.y += 2
-        print(self.rendText.get_rect())
 
     def update(self):
         
@@ -138,11 +138,60 @@ class button(pygame.sprite.Sprite):
         
         self.image.blit(self.rendText, self.textRect)
         
+class consumable(pygame.sprite.Sprite):
+    imgSheet = {'active': False, 'static': True,'tileWidth': 32}
+    image = pygame.Surface((imgSheet['tileWidth'], imgSheet['tileWidth']))
+
+    def __init__(self, game, pos, **kwargs):
+        self.game = game
+        self.groups = game.sprites, game.items, game.layer1
+        pygame.sprite.Sprite.__init__(self, self.groups)
+
+        for k, v in kwargs.items():
+            self.__dict__[k] = v
+
+        if self.imgSheet['active']:
+            self.animations = animation(self)
+
+        self.pos = pygame.Vector2(pos)
+        self.rect = pygame.Rect(0, 0, self.imgSheet['tileWidth'], self.imgSheet['tileWidth'])
+        self.rect.x = self.pos.x
+        self.rect.y = self.pos.y
+
+    def update(self):
+        if self.imgSheet['active']:
+            self.animations.update()
         
+
+class tp1(teleporter):
+    def __init__(self, game, pos, target):
+        super().__init__(game, asset('objects/teleporter1.png'), pos, target)
+
+class gunConsumable(consumable):
+    def __init__(self, game, pos, gun, **kwargs):  
+        self.gun = gun
+        super().__init__(game, pos, **kwargs)
+
+class massFireGunConsumable(gunConsumable):
+    def __init__(self, game, pos):  
+        gun = massFireGun
+        image = pygame.image.load(asset('objects/gun.png'))
+        super().__init__(game, pos, gun, image = image)
+
+class tripleGunConsumable(gunConsumable):
+    def __init__(self, game, pos):  
+        gun = tripleGun
+        image = pygame.image.load(asset('objects/gun.png'))
+        super().__init__(game, pos, gun, image = image)
+
+class hpPack1(consumable):
+    def __init__(self, game, pos):
+        self.value = 15
+        image = pygame.image.load(asset('objects/decryptor.png'))
+        super().__init__(game, pos, image = image)
+
 def menuBtn(game, pos):
     return button(game, pos)
-def tp1(game, pos, target):
-    return teleporter(game, asset('objects/teleporter1.png'), pos, target)
 
 def bitCoin(game, pos):
     return coin(game, pos, asset('objects/bitCoin.png'))

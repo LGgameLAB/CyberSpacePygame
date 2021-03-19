@@ -27,6 +27,7 @@ class game:
         self.sprites = pygame.sprite.Group()
         self.colliders = pygame.sprite.Group()
         self.pBullets = pygame.sprite.Group()
+        self.eBullets = pygame.sprite.Group()   
         self.items = pygame.sprite.Group()
         self.layer1 = pygame.sprite.Group()
         self.layer2 = pygame.sprite.Group()
@@ -35,9 +36,9 @@ class game:
         self.rendLayers = [self.layer1, self.layer2]
 
         self.win = pygame.display.set_mode((winWidth, winHeight))
-        self.font1 = pygame.font.SysFont(os.path.join('fonts', 'YuseiMagic-Regular.ttf'), 40)
+        self.font1 = pygame.font.Font(os.path.join('fonts', 'YuseiMagic-Regular.ttf'), 30)
         self.font2 = pygame.font.SysFont('Comic Sans MS', 23)
-        self.menuFont = pygame.font.SysFont(os.path.join('fonts', 'YuseiMagic-Regular.ttf'), 25)
+        self.menuFont = pygame.font.Font(os.path.join('fonts', 'YuseiMagic-Regular.ttf'), 15)
         self.loop = 0
         self.points = 0
         self.gravity = 1
@@ -66,13 +67,21 @@ class game:
         self.mainLoop()
 
     #### Controls how the levels will load ####
-    def loadLevel(self, levelNum, *args):
+    def loadLevel(self, levelNum, *args):   
         if len(args) < 1:
+            try:
+                self.level.door.kill()
+                for tp in self.level.teleporters:
+                    tp.kill()
+            except:
+                pass
+
             for enemy in self.enemies:
                 enemy.kill()
             
             for sprite in  self.colliders:
                 sprite.kill()
+
 
             self.level = self.levels[levelNum-1] 
             self.level.load(self)
@@ -88,7 +97,8 @@ class game:
                 self.player.pos.y = self.level.pStartY
             except:
                 print("No player Pos")
-    
+            
+
         else:
             for enemy in self.enemies:
                     enemy.kill()
@@ -147,7 +157,7 @@ class game:
         for sprite in self.overlayer:
             self.win.blit(sprite.image, sprite.rect)
         
-
+        
         if SHOWFPS:
             fpsText = self.font2.render(str(self.currentFps), True, (255, 255, 255))
             self.win.blit(fpsText, (1100, 5))
@@ -166,13 +176,26 @@ class game:
         hits = pygame.sprite.spritecollide(self.player, self.enemies, False)
         for hit in hits:
             self.player.takeDamage(hit.damage)
+        
+        hits = pygame.sprite.spritecollide(self.player, self.eBullets, False)
+        for hit in hits:
+            self.player.takeDamage(hit.damage)
 
         pygame.sprite.groupcollide(self.colliders, self.pBullets, False, True)
-        
+        pygame.sprite.groupcollide(self.colliders, self.eBullets, False, True)
+
         items = pygame.sprite.spritecollide(self.player, self.items, True)
         for item in items:
             if isinstance(item, coin):
                 self.points += item.value
+            elif isinstance(item, gunConsumable):
+                self.player.gun.kill()
+                
+                self.player.gun = item.gun(self, self.player)
+                self.points += 50
+
+            elif isinstance(item, hpPack1):
+                self.player.health += item.value
 
         tpCols = pygame.sprite.spritecollide(self.player, self.level.teleporters, False)
         for tp in tpCols:
@@ -192,6 +215,7 @@ class game:
             if pygame.sprite.collide_rect(self.player, self.level.door) and self.level.keyObtained:
                 self.loadLevel(self.levels.index(self.level) + 2)
         except:
+            self.loadData()
             self.run()
 
     def quit(self):
@@ -238,7 +262,7 @@ class game:
     def menuLoop(self):
         run = True
         startButton = button(self, (winWidth/2, 140), text="Start", center = True)
-        loadCustomLevelBtn = button(self, (winWidth/2, 100), text="Load Custom Level")
+        loadCustomLevelBtn = button(self, (winWidth/2, 100), text="Load Custom Level", center = True)
         buttons = pygame.sprite.Group(startButton, loadCustomLevelBtn)
         while run:
             pygame.time.delay(50)
