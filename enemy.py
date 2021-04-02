@@ -56,26 +56,6 @@ class enemy(pygame.sprite.Sprite):
                 self.dir = pygame.Vector2((0, -self.dir.y))
 
         self.pos += self.dir *self.vel 
-    
-    ## Bounces off walls
-    def move2(self):
-        testVec = pygame.Vector2((self.pos.x, self.pos.y))
-        if self.collideCheck(pygame.Vector2(testVec.x+(self.dir.x*self.vel), testVec.y)):
-            
-            if self.dir.x > 0:
-                self.dir = self.dir.reflect((-1,0))
-            else:
-                self.dir = self.dir.reflect((1,0))
-        
-        self.pos.x += self.dir.x*self.vel
-        
-        if self.collideCheck(pygame.Vector2(testVec.x, testVec.y+(self.dir.y*self.vel))):
-            if self.dir.y > 0:
-                self.dir = self.dir.reflect((0, -1))
-            else:
-                self.dir = self.dir.reflect((0, 1))
-        
-        self.pos.y += self.dir.y*self.vel
         
 
     def collideCheck(self, vector):

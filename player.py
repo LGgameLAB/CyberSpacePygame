@@ -4,7 +4,7 @@ import pygame
 import math
 from stgs import *
 from animations import *
-
+from objects import *
 #### Player object ####
 class player(pygame.sprite.Sprite):
     x = 71
@@ -38,7 +38,7 @@ class player(pygame.sprite.Sprite):
             self.__dict__[k] = v
         
         self.loadAnimations()
-        self.hpBar = healthBar(self.game, self)
+        self.hpBar = healthBar2(self.game, self)
 
     def loadAnimations(self):
         self.animations = animation(self)
@@ -101,7 +101,7 @@ class player(pygame.sprite.Sprite):
         else:
             #### Checks bottom collide ####
             downVec = pygame.math.Vector2((0, self.yMod+self.fall))
-            if self.collideCheck(self.pos + downVec*self.vel):
+            if self.collideCheck(self.pos + downVec*self.vel, 'd'):
                 x=0
                 while self.collideCheck(self.pos + (0, x*self.vel)):
                     x -= 0.01
@@ -141,236 +141,37 @@ class player(pygame.sprite.Sprite):
         returnVal = False
         #### Checks for super collision. Not in current use - still needs developing and attempts to fix bug of teleportation through platforms
         if len(args) > 0:
-            arg = args[0]
-            colDir = arg[0]
-            dist = abs(arg[1])
-            x = 0
-            while x < dist:
-                if colDir == 'r':
-                    testRect = pygame.Rect(round(vector.x) - x, round(vector.y), self.rect.width, self.rect.height)
-                elif colDir == 'l':
-                    testRect = pygame.Rect(round(vector.x) + x, round(vector.y), self.rect.width, self.rect.height)
-                elif colDir == 'u':
-                    testRect = pygame.Rect(round(vector.x), (vector.y) + x, self.rect.width, self.rect.height)
-                elif colDir == 'd':
-                    testRect = pygame.Rect(round(vector.x), round(vector.y) - x, self.rect.width, self.rect.height)
+            if args[0] == 'd':
+                testRect = pygame.Rect(vector.x, vector.y, self.rect.width, self.rect.height)
                 for obj in self.game.colliders:
                     if testRect.colliderect(obj.rect):
                         returnVal = True
-                x += 0.05
+                        if isinstance(obj, mPlatform):
+                            print(obj.dir)
+                            self.dir += (obj.dir * obj.vel)/self.vel
+            else:
+                arg = args[0]
+                colDir = arg[0]
+                dist = abs(arg[1])
+                x = 0
+                while x < dist:
+                    if colDir == 'r':
+                        testRect = pygame.Rect(round(vector.x) - x, round(vector.y), self.rect.width, self.rect.height)
+                    elif colDir == 'l':
+                        testRect = pygame.Rect(round(vector.x) + x, round(vector.y), self.rect.width, self.rect.height)
+                    elif colDir == 'u':
+                        testRect = pygame.Rect(round(vector.x), (vector.y) + x, self.rect.width, self.rect.height)
+                    elif colDir == 'd':
+                        testRect = pygame.Rect(round(vector.x), round(vector.y) - x, self.rect.width, self.rect.height)
+                    for obj in self.game.colliders:
+                        if testRect.colliderect(obj.rect):
+                            returnVal = True
+                    x += 0.05
         else: 
-            testRect = pygame.Rect(round(vector.x), round(vector.y), self.rect.width, self.rect.height)
+            testRect = pygame.Rect(vector.x, vector.y, self.rect.width, self.rect.height)
             for obj in self.game.colliders:
                 if testRect.colliderect(obj.rect):
                     returnVal = True
             
         return returnVal
 
-class gun(pygame.sprite.Sprite):
-    x = 0
-    y = 0
-    rect = pygame.Rect(x, y, 64, 64)
-    damage = 5
-    reloadTime = 200
-    imgSource = ''
-    def __init__(self, game, image, player, **kwargs):
-        self.groups = game.sprites, game.layer2
-        pygame.sprite.Sprite.__init__(self, self.groups)
-
-        self.game = game
-        self.player = player
-        self.imgSource  = pygame.image.load(image)
-        self.image = pygame.image.load(image)
-        self.lastFire = -self.reloadTime
-        self.rect = pygame.Rect(0, 0, self.image.get_width(), self.image.get_height())
-        self.pos = pygame.Vector2(self.player.rect.center)
-
-        for k, v in kwargs.items():
-            self.__dict__[k] = v
-    
-    def update(self):
-        self.pos = pygame.Vector2(self.player.rect.center)
-        self.rect.center = self.pos
-        self.rect.x += 20
-        self.setAngle()
-        if pygame.time.get_ticks() - self.lastFire >= self.reloadTime:
-            self.checkFire()
-
-    #### Checks for bullet fire ####
-    def checkFire(self):   ## This got complicated so I will break it down
-        for event in self.game.events:
-            if event.type == pygame.MOUSEBUTTONUP:  ## Checks on click release
-                mPos = pygame.Vector2(pygame.mouse.get_pos())  ## Gets mouse position and stores it in vector. This will be translated into the vector that moves the bullet
-                pPos = self.game.cam.apply(self.player)  ## Gets actual position of player on screen
-                mPos.x -= pPos.centerx ## Finds the x and y relativity between the mouse and player and then calculates the offset
-                mPos.y -= pPos.centery
-                self.setAngle(False)
-                self.fire(mPos) ## Inputs values. Notice how I used rect.center instead of pPos.
-                self.lastFire = pygame.time.get_ticks()
-    
-    def fire(self, mPos):
-        bullet(self.game, self.rect.center, mPos, self.angle)
-
-    def setAngle(self, *args):
-        if len(args) > 0:
-            move = args[0]
-        else:
-            move = True
-        mPos = pygame.Vector2(pygame.mouse.get_pos())
-        pPos = self.game.cam.apply(self.player)  ## Gets actual position of player on screen
-        mPos.x -= pPos.centerx ## Finds the x and y relativity between the mouse and player and then calculates the offset
-        mPos.y -= pPos.centery
-        try:
-            self.angle = math.degrees(math.atan2(-mPos.normalize().y, mPos.normalize().x))
-        except ValueError:
-            self.angle = 0
-
-        if self.angle > 90 or self.angle < -90:
-            self.rotCenter(-(self.angle))
-            self.image = pygame.transform.flip(self.image, False, True)
-            if move:
-                self.rect.x -= 25
-        else:
-            self.rotCenter()
-        
-
-    def rotCenter(self, *args):
-        if len(args) > 0:
-            angle = args[0]
-        else:
-            angle = self.angle
-        
-        self.image = pygame.transform.rotate(self.imgSource, angle)
-        self.rect = self.image.get_rect(center = self.image.get_rect(center = self.rect.center).center)
-
-class massFireGun(gun):
-    def __init__(self, game, player):
-        super().__init__(game, asset('objects/gun.png'), player, damage = 2)
-    
-    def fire(self, mPos):
-        bullet(self.game, self.rect.center, mPos, self.angle, offset = 180)
-        bullet(self.game, self.rect.center, mPos, self.angle, offset = 90)
-        bullet(self.game, self.rect.center, mPos, self.angle, offset = 5)
-        bullet(self.game, self.rect.center, mPos, self.angle, offset = 2.5)
-        bullet(self.game, self.rect.center, mPos, self.angle)
-        bullet(self.game, self.rect.center, mPos, self.angle, offset = -2.5)
-        bullet(self.game, self.rect.center, mPos, self.angle, offset = -5)
-        bullet(self.game, self.rect.center, mPos, self.angle, offset = -90)
-
-class tripleGun(gun):
-
-    def __init__(self, game, player):
-        super().__init__(game, asset('objects/gun.png'), player, damage = 2)
-
-    def fire(self, mPos):
-        bullet(self.game, self.rect.center, mPos, self.angle, offset = 5)
-        bullet(self.game, self.rect.center, mPos, self.angle)
-        bullet(self.game, self.rect.center, mPos, self.angle, offset = -5)
-
-class lazerGun(gun):
-
-    def __init__(self, game, player):
-        super().__init__(game, asset('objects/gun.png'), player, damage = 1)
-
-    def fire(self, mPos):
-        lazer(self.game, self.rect.center, mPos, self.angle)
-
-class standardGun(gun):
-    def __init__(self, game, player):
-        super().__init__(game, asset('objects/gun.png'), player, damage = 2)
-
-#### Bullet Class #### 
-class bullet(pygame.sprite.Sprite):
-    pos = pygame.Vector2((0,0))
-    image = pygame.image.load(asset('objects/bullet2.png'))
-    vel = 20
-    offset = 0
-    static = False
-    def __init__(self, game, pos, target, angle, **kwargs):
-        self.groups = game.sprites, game.pBullets, game.layer2
-        self.game = game
-        pygame.sprite.Sprite.__init__(self, self.groups)
-
-        for k, v in kwargs.items():
-            self.__dict__[k] = v
-
-        self.pos = pygame.Vector2(pos)
-        self.dir = pygame.Vector2(target).normalize()
-        self.dir = self.dir.rotate(self.offset)
-        self.image = pygame.transform.rotate(self.image, angle - self.offset)
-        self.rect = pygame.Rect(0, 0, self.image.get_width(), self.image.get_height())
-        self.rect.center = self.pos
-    
-    def update(self):
-        if not self.static:
-            self.pos += self.dir *self.vel
-            self.rect.center = self.pos
-
-class healthBar(pygame.sprite.Sprite):
-    x = winWidth/3
-    y = 3
-    width = 100
-    height = 30
-    bgColor = colors.black
-    hpColor = colors.green
-    def __init__(self, game, player, **kwargs):
-        self.groups = game.sprites, game.overlayer
-        pygame.sprite.Sprite.__init__(self, self.groups)
-        
-        for k, v in kwargs.items():
-            self.__dict__[k] = v
-
-        self.player = player
-        self.image = pygame.Surface((self.width, self.height))
-        self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
-        self.barRect = pygame.Rect(0, 0, self.width-2, self.height-2)
-        self.barRect.centerx, self.barRect.centery = self.rect.centerx - self.x, self.rect.centery - self.y
-    
-    def update(self):
-        self.image.fill((self.bgColor))
-        pygame.draw.rect(self.image, self.hpColor, (1, 1, (self.width - 2)*(self.player.health/self.player.maxHp), self.height -2))
-
-class lazer(bullet):
-    def __init__(self, game, pos, target, angle):
-        self.limit = 40
-        self.colAcc = 9 # collision accuracy
-        self.beamWidth = 5
-        self.pPos = pos
-        self.lazers = []
-        self.angle = angle
-        self.initTime = pygame.time.get_ticks()
-        super().__init__(game, pos, target, angle, static=True)
-        self.render()
-    
-    def render(self):
-        x = 0
-        checkPos = self.pos
-        checkDir = self.dir*self.colAcc
-        checkRect = self.rect
-        while x < self.limit:
-            x+=1
-            checkPos += checkDir
-            checkRect.center = checkPos
-            self.lazers.append(bullet(self.game, checkPos, checkPos, self.angle, static=True, image=pygame.image.load(asset('objects/lazer.png'))))
-            if self.checkCol(checkRect):
-                break
-
-        self.finalPoint = checkPos
-        self.pos = self.finalPoint
-        self.rect = (self.pos.x, self.pos.y, self.beamWidth, self.beamWidth)
-    
-    def checkCol(self, rect):
-        returnVal = False
-        for obj in self.game.colliders:
-            if rect.colliderect(obj.rect):
-                returnVal = True
-        return returnVal
-    
-    def update(self):
-        super().update()
-        print(pygame.time.get_ticks() - self.initTime)
-        if pygame.time.get_ticks() - self.initTime >= 200:
-            for l in self.lazers:
-                l.kill()
-            self.kill()
-        

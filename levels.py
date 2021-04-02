@@ -109,6 +109,11 @@ class level:
                 text = fonts['3'].render(tile_object.text, True, (255, 255, 255))
                 self.image.blit(text, (tile_object.x, tile_object.y))
 
+            if tile_object.name == 'dmgRect':
+                dmgRect(self.game, (tile_object.x, tile_object.y, tile_object.width, tile_object.height))
+            
+            if tile_object.name == 'mPlatform':
+                mPlatform(self.game, (tile_object.x, tile_object.y, tile_object.width, tile_object.height))
 ## Handles loading a level from a Cyberspace website link
 import requests
 from zipfile import ZipFile
@@ -187,5 +192,9 @@ level3 = level(
     rendType = 1,
     mapDir = asset('Tiled/level3/level3.tmx')
 )
+level4 = level(
+    rendType = 1,
+    mapDir = asset('Tiled/level4/level4.tmx')
+)
 ### All Game levels
-gameLevels = [level1, level2, level3, ]
+gameLevels = [ level1, level2, level3, level4,]

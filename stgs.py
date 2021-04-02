@@ -1,5 +1,6 @@
 import os
 import pygame
+import colors
 
 #### Establishes file paths ####
 PATH = os.path.dirname(os.path.abspath(__file__))
@@ -19,7 +20,7 @@ def asset(assetName):
 winWidth, winHeight = 1200, 700
 
 #### Defines what key binding is set for each action ####
-keySet = {'start': pygame.K_s, 'pRight': [pygame.K_RIGHT, pygame.K_d], 'pLeft': [pygame.K_LEFT, pygame.K_a], 'pUp': [pygame.K_UP, pygame.K_w], 'fullScreen': pygame.K_f}
+keySet = {'start': pygame.K_s, 'pRight': [pygame.K_RIGHT, pygame.K_d], 'pLeft': [pygame.K_LEFT, pygame.K_a], 'pUp': [pygame.K_UP, pygame.K_w], 'fullScreen': pygame.K_f, 'pause': pygame.K_p}
 
 #### Changes movement from flying to platforming ####
 platformer = False
@@ -59,18 +60,8 @@ fonts = {'1': pygame.font.Font(os.path.join('fonts', 'YuseiMagic-Regular.ttf'), 
         '2': pygame.font.SysFont('Comic Sans MS', 23),
         '3': pygame.font.Font(os.path.join('fonts', 'PottaOne-Regular.ttf'), 32),}
 
-class colors:
-    blue = (0, 0, 128)
-    black = (0,0,0)
-    white = (255,255,255)
-    shadow = (192, 192, 192)
-    white = (255, 255, 255)
-    lightGreen = (0, 255, 0)
-    green = (0, 200, 0)
-    blue = (0, 0, 128)
-    lightBlue = (0, 0, 255)
-    red = (200, 0, 0 )
-    lightRed = (255, 100, 100)
-    purple = (102, 0, 102)
+def sAsset(assetName):
+    global ASSETSPATH
 
-
+    return os.path.join(ASSETSPATH, 'sounds', assetName)
+    

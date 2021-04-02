@@ -1,16 +1,20 @@
 import pygame
 import pyperclip
+
 pygame.init()
+import os
 import random
 import sys
-import os
-from stgs import *
-from player import *
-from enemy import *
+
 from camera import *
-from objects import *
-from levels import *
+from enemy import *
 from fx import *
+from levels import *
+from objects import *
+from player import *
+from sfx import *
+from stgs import *
+
 
 #### Game object ####
 class game:
@@ -25,7 +29,9 @@ class game:
     def __init__(self):
         self.enemies = pygame.sprite.Group()
         self.sprites = pygame.sprite.Group()
+        self.pSprites = pygame.sprite.Group()
         self.colliders = pygame.sprite.Group()
+        self.dmgRects = pygame.sprite.Group()
         self.pBullets = pygame.sprite.Group()
         self.eBullets = pygame.sprite.Group()   
         self.items = pygame.sprite.Group()
@@ -34,11 +40,14 @@ class game:
         self.fxLayer = pygame.sprite.Group()
         self.overlayer = pygame.sprite.Group()
         self.rendLayers = [self.layer1, self.layer2]
+        self.mixer = gameMixer()
 
         self.win = pygame.display.set_mode((winWidth, winHeight))
         self.font1 = pygame.font.Font(os.path.join('fonts', 'YuseiMagic-Regular.ttf'), 30)
         self.font2 = pygame.font.SysFont('Comic Sans MS', 23)
         self.menuFont = pygame.font.Font(os.path.join('fonts', 'YuseiMagic-Regular.ttf'), 15)
+        self.pause = False
+        self.lastPause = pygame.time.get_ticks()
         self.loop = 0
         self.points = 0
         self.gravity = 1
@@ -68,6 +77,21 @@ class game:
 
     #### Controls how the levels will load ####
     def loadLevel(self, levelNum, *args):   
+        for enemy in self.enemies:
+            enemy.kill()
+        
+        for sprite in  self.colliders:
+            sprite.kill()
+            
+        for sprite in  self.eBullets:
+            sprite.kill()
+
+        for sprite in  self.pBullets:
+            sprite.kill()
+
+        for sprite in  self.dmgRects:
+            sprite.kill()
+
         if len(args) < 1:
             try:
                 self.level.door.kill()
@@ -75,12 +99,6 @@ class game:
                     tp.kill()
             except:
                 pass
-
-            for enemy in self.enemies:
-                enemy.kill()
-            
-            for sprite in  self.colliders:
-                sprite.kill()
 
 
             self.level = self.levels[levelNum-1] 
@@ -91,7 +109,7 @@ class game:
                 colliderRects.append(p.rect)
             
             self.cam.width, self.cam.height = self.level.rect.width, self.level.rect.height
-
+            
             try:
                 self.player.pos.x = self.level.pStartX
                 self.player.pos.y = self.level.pStartY
@@ -132,7 +150,11 @@ class game:
     def update(self): 
         self.getFps()
         self.getFullScreen()
-        self.sprites.update()
+        self.getPause()
+        if self.pause:
+            self.pSprites.update()
+        else:
+            self.sprites.update()
         self.cam.update(self.player)
         
         self.render()
@@ -177,6 +199,11 @@ class game:
         for hit in hits:
             self.player.takeDamage(hit.damage)
         
+        hits = pygame.sprite.spritecollide(self.player, self.dmgRects, False)
+        for hit in hits:
+            
+            self.player.takeDamage(hit.damage)
+
         hits = pygame.sprite.spritecollide(self.player, self.eBullets, False)
         for hit in hits:
             self.player.takeDamage(hit.damage)
@@ -211,12 +238,12 @@ class game:
                 self.level.key.kill()
         except:
             pass
-        try:
-            if pygame.sprite.collide_rect(self.player, self.level.door) and self.level.keyObtained:
-                self.loadLevel(self.levels.index(self.level) + 2)
-        except:
-            self.loadData()
-            self.run()
+        #try:
+        if pygame.sprite.collide_rect(self.player, self.level.door) and self.level.keyObtained:
+            self.loadLevel(self.levels.index(self.level) + 2)
+        #except:
+            #self.loadData()
+            #self.run()
 
     def quit(self):
         pygame.quit()
@@ -257,6 +284,16 @@ class game:
                 self.win = pygame.display.set_mode((winWidth, winHeight), pygame.FULLSCREEN)
                 self.fullScreen = True
             #pygame.display.toggle_fullscreen()
+
+    def getPause(self):
+        if pygame.time.get_ticks() - self.lastPause >= 120:
+            keys = pygame.key.get_pressed()
+            if keys[keySet['pause']]:
+                if self.pause:
+                    self.pause = False
+                else:
+                    self.pause = True
+                self.lastPause = pygame.time.get_ticks()
 
     #### First menu loop ####
     def menuLoop(self):
