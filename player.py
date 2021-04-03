@@ -26,7 +26,6 @@ class player(pygame.sprite.Sprite):
         self.game = game
         self.image = pygame.image.load(image)
         self.rect = pygame.Rect(0, 0, self.width, self.height)
-        self.pos = pygame.math.Vector2(self.x, self.y)
         self.dir = pygame.math.Vector2((0, 0))
         self.vel = 8
         self.fall = 0
@@ -46,7 +45,6 @@ class player(pygame.sprite.Sprite):
     #### Updates player ####
     def update(self):
         self.move()
-        self.rect.topleft = round(self.pos.x), round(self.pos.y)
         self.animations.update()
     
     def takeDamage(self, damage):
@@ -55,67 +53,28 @@ class player(pygame.sprite.Sprite):
             self.lastHit = pygame.time.get_ticks()
     #### Move Physics ####
     def move(self):
-        keys = pygame.key.get_pressed()
+        # print(self.ground)
         self.dir = pygame.math.Vector2((0, 0))
 
-        #### Right movement ####
+        ## Checks for left and right movement. They counterbalance if both are pressed.
         if checkKey(keySet['pRight']):
-            rightVec = pygame.math.Vector2((1, 0))
-            
-            if self.collideCheck(self.pos + rightVec*self.vel):
-                x=0
-                while not self.collideCheck(self.pos + (x*self.vel, 0)):
-                    x += 0.05
-                if x == 0:
-                    self.dir -= (0.00, 0)
-                else:
-                    self.dir += (x-0.05,0)
-            else:
-                self.dir += rightVec
-
-        #### Left movement ####
+            self.dir.x += 1
         if checkKey(keySet['pLeft']):
-            leftVec = pygame.math.Vector2((-1, 0))
-            
-            if self.collideCheck(self.pos + leftVec*self.vel):
-                self.dir += (0,0)
-            else:
-                self.dir += leftVec
-
+            self.dir.x -= 1
         
-        self.fall = 0.01*self.gravity
+        ## Checks collision after horizontal movement
+        collide = self.collideCheck()
+        if collide:
+            if self.dir.x > 0:
+                self.rect.right = collide.left
+            else: 
+                self.rect.left = collide.right
+            self.dir.x = 0
 
-        #### Checks top collide ####
-        roofCollide = False
-        if self.yMod < 0:
-            self.ground = False
-            upVec = pygame.math.Vector2((0, self.yMod-0.02))
-            if self.collideCheck(self.pos + upVec*self.vel ): #, ('u', (self.yMod-0.02)*self.vel)):
-                x=0
-                while self.collideCheck(self.pos + (0, x*self.vel)):
-                    x += 0.01
-            
-                self.dir += (0, x - 0.0)
-                roofCollide = True
-                self.yMod = max(0, self.yMod)
-        else:
-            #### Checks bottom collide ####
-            downVec = pygame.math.Vector2((0, self.yMod+self.fall))
-            if self.collideCheck(self.pos + downVec*self.vel, 'd'):
-                x=0
-                while self.collideCheck(self.pos + (0, x*self.vel)):
-                    x -= 0.01
-
-                self.dir += (0, x-0.00)
-                self.yMod = min(0, self.yMod)
-                self.ground = True
-            else:
-                self.ground = False
-        
-        #### Falling mechanic ####
-        if not self.ground:
-            self.yMod = min(self.yModMax, self.yMod+self.fall)
-
+        ## Calculates the Gravity and sets the yMod to going down
+        self.fall = 0.02*self.gravity
+        ## min func limits the fall speed to yModMax
+        self.yMod = min(self.yModMax, self.yMod+self.fall)
 
         #### Checks game type for flying or jumping ####
         if platformer:
@@ -123,55 +82,48 @@ class player(pygame.sprite.Sprite):
                 if checkKey(keySet['pUp']):
                     self.yMod = -0.5 
         else:
-            if not roofCollide:
-                if checkKey(keySet['pUp']):
-                    self.yMod = max(self.yModMin, self.yMod-0.02)
+            if checkKey(keySet['pUp']):
+                self.yMod = max(self.yModMin, self.yMod-0.05)
 
-        self.dir += (0, self.yMod*self.vel)
-        self.pos += self.dir * self.vel
+        ## Applies yMod to the direction. Still applies velocity to downwards movement 
+        self.dir.y += self.yMod*self.vel
+        collide = self.collideCheck()
+        if self.dir.y < 0:
+            self.ground = False
+
+        if collide:
+            if self.dir.y > 0:
+                self.rect.bottom = collide.top
+                self.ground = True
+            else: 
+                self.rect.top = collide.bottom
+                self.ground = False
+            self.dir.y = 0
+            self.yMod = 0
+        
+
+        print(self.ground)
+
+        self.rect.x += self.dir.x * self.vel
+        self.rect.y += self.dir.y * self.vel
 
         if self.roomBound:
-            self.pos.x = max(0, self.pos.x)
-            self.pos.x = min(winWidth-self.rect.width, self.pos.x)
-            self.pos.y = max(0, self.pos.y)
-            self.pos.y = min(winHeight-self.rect.height, self.pos.y)
+            self.rect.x = max(0, self.rect.x)
+            self.rect.x = min(winWidth-self.rect.width, self.rect.x)
+            self.rect.y = max(0, self.rect.y)
+            self.rect.y = min(winHeight-self.rect.height, self.rect.y)
 
     #### Collide checker for player ####
-    def collideCheck(self, vector, *args):
+    def collideCheck(self):
         returnVal = False
-        #### Checks for super collision. Not in current use - still needs developing and attempts to fix bug of teleportation through platforms
-        if len(args) > 0:
-            if args[0] == 'd':
-                testRect = pygame.Rect(vector.x, vector.y, self.rect.width, self.rect.height)
-                for obj in self.game.colliders:
-                    if testRect.colliderect(obj.rect):
-                        returnVal = True
-                        if isinstance(obj, mPlatform):
-                            print(obj.dir)
-                            self.dir += (obj.dir * obj.vel)/self.vel
-            else:
-                arg = args[0]
-                colDir = arg[0]
-                dist = abs(arg[1])
-                x = 0
-                while x < dist:
-                    if colDir == 'r':
-                        testRect = pygame.Rect(round(vector.x) - x, round(vector.y), self.rect.width, self.rect.height)
-                    elif colDir == 'l':
-                        testRect = pygame.Rect(round(vector.x) + x, round(vector.y), self.rect.width, self.rect.height)
-                    elif colDir == 'u':
-                        testRect = pygame.Rect(round(vector.x), (vector.y) + x, self.rect.width, self.rect.height)
-                    elif colDir == 'd':
-                        testRect = pygame.Rect(round(vector.x), round(vector.y) - x, self.rect.width, self.rect.height)
-                    for obj in self.game.colliders:
-                        if testRect.colliderect(obj.rect):
-                            returnVal = True
-                    x += 0.05
-        else: 
-            testRect = pygame.Rect(vector.x, vector.y, self.rect.width, self.rect.height)
-            for obj in self.game.colliders:
-                if testRect.colliderect(obj.rect):
-                    returnVal = True
+        testPos = pygame.Vector2(self.rect.topleft)
+        testPos += self.dir*self.vel
+        testRect = pygame.Rect(testPos.x, testPos.y, self.rect.width, self.rect.height)
+        for obj in self.game.colliders:
+            if testRect.colliderect(obj.rect):
+                returnVal = obj.rect
+                if isinstance(obj, mPlatform):
+                    self.dir.x += (obj.dir.x * obj.vel)/self.vel
             
         return returnVal
 

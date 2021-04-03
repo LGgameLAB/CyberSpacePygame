@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.4" tiledversion="1.4.1" orientation="orthogonal" renderorder="right-down" width="100" height="56" tilewidth="32" tileheight="32" infinite="0" nextlayerid="4" nextobjectid="145">
+<map version="1.4" tiledversion="1.4.1" orientation="orthogonal" renderorder="right-down" width="100" height="56" tilewidth="32" tileheight="32" infinite="0" nextlayerid="4" nextobjectid="148">
  <tileset firstgid="1" source="../cyber_space_tileset1.tsx"/>
  <tileset firstgid="5" source="../cyber_space_tileset2.tsx"/>
  <layer id="1" name="Tile Layer 1" width="100" height="56">
@@ -22,7 +22,6 @@
   <object id="7" name="Player" x="472" y="944">
    <point/>
   </object>
-  <object id="8" name="door" x="3072" y="920" width="88" height="128"/>
   <object id="9" name="wall" x="672" y="896" width="704" height="32"/>
   <object id="10" name="wall" x="1344" y="896" width="32" height="896"/>
   <object id="11" name="teleporter" type="tp1" x="320" y="32" width="64" height="96">
@@ -279,5 +278,7 @@
   <object id="142" name="dmgRect" x="2944" y="128" width="32" height="32"/>
   <object id="143" name="wall" x="2984" y="136" width="16" height="16"/>
   <object id="144" name="dmgRect" x="2976" y="128" width="32" height="32"/>
+  <object id="145" name="door" x="3072" y="928" width="96" height="128"/>
+  <object id="146" name="wall" x="992" y="224" width="160" height="32"/>
  </objectgroup>
 </map>

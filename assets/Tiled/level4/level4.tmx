@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.4" tiledversion="1.4.1" orientation="orthogonal" renderorder="right-down" width="150" height="25" tilewidth="32" tileheight="32" infinite="0" nextlayerid="5" nextobjectid="43">
+<map version="1.4" tiledversion="1.4.1" orientation="orthogonal" renderorder="right-down" width="150" height="25" tilewidth="32" tileheight="32" infinite="0" nextlayerid="5" nextobjectid="44">
  <tileset firstgid="1" source="../cyber_space_tileset1.tsx"/>
  <tileset firstgid="5" source="../cyber_space_tileset2.tsx"/>
  <layer id="1" name="Tile Layer 1" width="150" height="25">
@@ -37,9 +37,9 @@
   <object id="40" name="Player" x="280" y="176">
    <point/>
   </object>
-  <object id="41" name="door" x="4448" y="312" width="88" height="128"/>
   <object id="42" name="key" x="664" y="248">
    <point/>
   </object>
+  <object id="43" name="door" x="4608" y="320" width="96" height="128"/>
  </objectgroup>
 </map>

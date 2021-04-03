@@ -27,6 +27,7 @@ class mPlatform(pygame.sprite.Sprite):
         self.game = game
         self.rect = pygame.Rect(rect)
         self.pos = pygame.Vector2((self.rect.x, self.rect.y))
+        self.player = self.game.player
 
         for k, v in kwargs.items():
             self.__dict__[k] = v
@@ -56,7 +57,14 @@ class mPlatform(pygame.sprite.Sprite):
                 self.dir = self.dir.reflect((1,0))
         
         self.pos.x += self.dir.x*self.vel
-        
+        # If we hit player move the player
+        testRect = pygame.Rect(self.pos.x, self.pos.y, self.rect.width, self.rect.height)
+        if testRect.colliderect(self.player.rect):
+            if self.dir.x < 0:
+                self.player.rect.right = testRect.left
+            else:
+                self.player.rect.left = testRect.right
+
         if self.collideCheck(pygame.Vector2(testVec.x, testVec.y+(self.dir.y*self.vel))):
             if self.dir.y > 0:
                 self.dir = self.dir.reflect((0, -1))
@@ -64,6 +72,13 @@ class mPlatform(pygame.sprite.Sprite):
                 self.dir = self.dir.reflect((0, 1))
         
         self.pos.y += self.dir.y*self.vel
+        # If we hit player move the player
+        # if not self.player.dir.y == 0:
+        #     if self.rect.colliderect(self.player.rect):
+        #         if self.dir.y < 0:
+        #             self.player.rect.bottom = self.rect.top
+        #         else:
+        #             self.player.rect.top = self.rect.bottom
 
     def collideCheck(self, vector):
             returnVal = False
@@ -89,8 +104,9 @@ class door(pygame.sprite.Sprite):
         for k, v in kwargs.items():
             self.__dict__[k] = v
 
-        self.image = pygame.Surface((self.rect.width, self.rect.height))
-        self.image.fill(self.color)
+        # self.image = pygame.Surface((self.rect.width, self.rect.height))
+        # self.image.fill(self.color)
+        self.image = pygame.image.load(asset('objects/door.png'))
 
 class key(pygame.sprite.Sprite):
     color = (255, 255, 255)

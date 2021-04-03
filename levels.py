@@ -197,4 +197,4 @@ level4 = level(
     mapDir = asset('Tiled/level4/level4.tmx')
 )
 ### All Game levels
-gameLevels = [ level1, level2, level3, level4,]
+gameLevels = [level1, level2, level3,  level4,]

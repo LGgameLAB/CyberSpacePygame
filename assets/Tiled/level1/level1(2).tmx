@@ -53,7 +53,7 @@
    </properties>
    <point/>
   </object>
-  <object id="11" name="Player" x="184" y="192">
+  <object id="11" name="Player" x="160" y="192">
    <point/>
   </object>
   <object id="12" name="wall" x="96" y="128" width="1120" height="32"/>

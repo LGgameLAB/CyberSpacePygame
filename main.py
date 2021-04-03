@@ -111,8 +111,7 @@ class game:
             self.cam.width, self.cam.height = self.level.rect.width, self.level.rect.height
             
             try:
-                self.player.pos.x = self.level.pStartX
-                self.player.pos.y = self.level.pStartY
+                self.player.rect.topleft = self.level.pStartX, self.level.pStartY
             except:
                 print("No player Pos")
             
@@ -130,8 +129,7 @@ class game:
             self.cam.width, self.cam.height = self.level.rect.width, self.level.rect.height
 
             try:
-                self.player.pos.x = self.level.pStartX
-                self.player.pos.y = self.level.pStartY
+                self.player.rect.topleft = self.level.pStartX, self.level.pStartY
             except:
                 print("No player Pos")
 
@@ -227,7 +225,7 @@ class game:
         tpCols = pygame.sprite.spritecollide(self.player, self.level.teleporters, False)
         for tp in tpCols:
             fadeOut(self, speed = 20, alpha = 120, fadeBack = True)
-            self.player.pos = tp.target
+            self.player.rect.topleft = tp.target
 
 
 
