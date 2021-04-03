@@ -108,6 +108,22 @@ class door(pygame.sprite.Sprite):
         # self.image.fill(self.color)
         self.image = pygame.image.load(asset('objects/door.png'))
 
+class entrance(pygame.sprite.Sprite):
+    color = (255, 255, 255)
+
+    def __init__(self, game, rect, **kwargs):
+        self.groups = game.sprites, game.layer1
+        pygame.sprite.Sprite.__init__(self, self.groups)
+        
+        self.rect = pygame.Rect(rect)
+
+        for k, v in kwargs.items():
+            self.__dict__[k] = v
+
+        self.image = pygame.Surface((self.rect.width, self.rect.height))
+        self.image.fill(self.color)
+        #self.image = pygame.image.load(asset('objects/door.png'))
+
 class key(pygame.sprite.Sprite):
     color = (255, 255, 255)
 

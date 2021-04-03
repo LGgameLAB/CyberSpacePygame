@@ -22,7 +22,7 @@ class game:
     #### Initialize game object ####
     #
     # Groups each sprite type to perform targetted tasks
-    # All sprites do go into the sprites group
+    # All sprites go into the sprites group
     # Sets up window, font, gravity, and cam
     # Loads data for the game levels and the player
 
@@ -50,7 +50,7 @@ class game:
         self.lastPause = pygame.time.get_ticks()
         self.loop = 0
         self.points = 0
-        self.gravity = 1
+        self.gravity = 1.6
         self.currentFps = 0
         self.fullScreen = False
         self.cam = cam(winWidth, winHeight)
@@ -91,45 +91,36 @@ class game:
 
         for sprite in  self.dmgRects:
             sprite.kill()
+        
+        for sprite in self.items:
+            sprite.kill()
 
         if len(args) < 1:
             try:
-                self.level.door.kill()
-                for tp in self.level.teleporters:
-                    tp.kill()
+                for obj in self.level.objects:
+                    obj.kill()
             except:
                 pass
 
-
             self.level = self.levels[levelNum-1] 
             self.level.load(self)
-
-            colliderRects = []
-            for p in self.colliders:
-                colliderRects.append(p.rect)
             
             self.cam.width, self.cam.height = self.level.rect.width, self.level.rect.height
             
             try:
-                self.player.rect.topleft = self.level.pStartX, self.level.pStartY
+                self.player.rect.topleft = self.level.entrance.rect.center
             except:
                 print("No player Pos")
             
 
         else:
-            for enemy in self.enemies:
-                    enemy.kill()
-                
-            for sprite in  self.colliders:
-                sprite.kill()
-
             self.level = level(rendType=1, mapDir=importLevel(args[0]))
             self.level.load(self)
 
             self.cam.width, self.cam.height = self.level.rect.width, self.level.rect.height
 
             try:
-                self.player.rect.topleft = self.level.pStartX, self.level.pStartY
+                self.player.rect.topleft = self.level.entrance.rect.center
             except:
                 print("No player Pos")
 
@@ -153,10 +144,10 @@ class game:
             self.pSprites.update()
         else:
             self.sprites.update()
+            self.checkHits()
         self.cam.update(self.player)
         
         self.render()
-        self.checkHits()
 
         
         pygame.display.update()
@@ -227,8 +218,6 @@ class game:
             fadeOut(self, speed = 20, alpha = 120, fadeBack = True)
             self.player.rect.topleft = tp.target
 
-
-
         ### DEcryptor/key collision detection
         try:
             if pygame.sprite.collide_rect(self.player, self.level.key):
@@ -236,12 +225,29 @@ class game:
                 self.level.key.kill()
         except:
             pass
-        #try:
+        
         if pygame.sprite.collide_rect(self.player, self.level.door) and self.level.keyObtained:
-            self.loadLevel(self.levels.index(self.level) + 2)
-        #except:
-            #self.loadData()
-            #self.run()
+            self.pause = True
+            fadeOut(self, speed = 8, alpha = 40, onEnd = lambda:self.nextLevel())
+    def unPause(self):
+        self.pause = False
+
+    def nextLevel(self):
+        
+        if DEBUG:
+            try:
+                self.loadLevel(self.levels.index(self.level) + 2)
+                fadeIn(self, speed = 20, onEnd = lambda:self.unPause())
+            except IndexError:
+                self.loadData()
+                self.run()
+        else:
+            try:
+                self.loadLevel(self.levels.index(self.level) + 2)
+                fadeIn(self, onEnd = lambda:self.unPause())
+            except:
+                self.loadData()
+                self.run()
 
     def quit(self):
         pygame.quit()

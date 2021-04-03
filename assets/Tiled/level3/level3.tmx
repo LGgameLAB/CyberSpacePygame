@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.4" tiledversion="1.4.1" orientation="orthogonal" renderorder="right-down" width="100" height="56" tilewidth="32" tileheight="32" infinite="0" nextlayerid="4" nextobjectid="148">
+<map version="1.4" tiledversion="1.4.1" orientation="orthogonal" renderorder="right-down" width="100" height="56" tilewidth="32" tileheight="32" infinite="0" nextlayerid="4" nextobjectid="149">
  <tileset firstgid="1" source="../cyber_space_tileset1.tsx"/>
  <tileset firstgid="5" source="../cyber_space_tileset2.tsx"/>
  <layer id="1" name="Tile Layer 1" width="100" height="56">
@@ -19,9 +19,6 @@
   <object id="4" name="wall" x="32" y="1760" width="3144" height="32"/>
   <object id="5" name="wall" x="640" y="32" width="32" height="1056"/>
   <object id="6" name="wall" x="32" y="1056" width="608" height="32"/>
-  <object id="7" name="Player" x="472" y="944">
-   <point/>
-  </object>
   <object id="9" name="wall" x="672" y="896" width="704" height="32"/>
   <object id="10" name="wall" x="1344" y="896" width="32" height="896"/>
   <object id="11" name="teleporter" type="tp1" x="320" y="32" width="64" height="96">
@@ -258,16 +255,8 @@
   <object id="122" name="wall" x="2784" y="1504" width="32" height="256"/>
   <object id="123" name="wall" x="2848" y="1088" width="32" height="288"/>
   <object id="124" name="wall" x="2976" y="1376" width="32" height="224"/>
-  <object id="125" name="wall" x="2600" y="136" width="16" height="16"/>
-  <object id="126" name="dmgRect" x="2592" y="128" width="32" height="32"/>
-  <object id="127" name="wall" x="2632" y="136" width="16" height="16"/>
-  <object id="128" name="dmgRect" x="2624" y="128" width="32" height="32"/>
-  <object id="129" name="wall" x="2664" y="136" width="16" height="16"/>
-  <object id="130" name="dmgRect" x="2656" y="128" width="32" height="32"/>
-  <object id="131" name="wall" x="2696" y="136" width="16" height="16"/>
-  <object id="132" name="dmgRect" x="2688" y="128" width="32" height="32"/>
-  <object id="133" name="wall" x="2728" y="136" width="16" height="16"/>
-  <object id="134" name="dmgRect" x="2720" y="128" width="32" height="32"/>
+  <object id="125" name="wall" x="2600" y="136" width="144" height="16"/>
+  <object id="126" name="dmgRect" x="2592" y="128" width="160" height="32"/>
   <object id="135" name="wall" x="2856" y="136" width="16" height="16"/>
   <object id="136" name="dmgRect" x="2848" y="128" width="32" height="32"/>
   <object id="137" name="wall" x="2888" y="136" width="16" height="16"/>
@@ -280,5 +269,6 @@
   <object id="144" name="dmgRect" x="2976" y="128" width="32" height="32"/>
   <object id="145" name="door" x="3072" y="928" width="96" height="128"/>
   <object id="146" name="wall" x="992" y="224" width="160" height="32"/>
+  <object id="148" name="entrance" x="544" y="928" width="96" height="128"/>
  </objectgroup>
 </map>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.4" tiledversion="1.4.1" orientation="orthogonal" renderorder="right-down" width="65" height="25" tilewidth="32" tileheight="32" infinite="0" nextlayerid="4" nextobjectid="30">
+<map version="1.4" tiledversion="1.4.1" orientation="orthogonal" renderorder="right-down" width="65" height="25" tilewidth="32" tileheight="32" infinite="0" nextlayerid="4" nextobjectid="40">
  <tileset firstgid="1" source="../cyber_space_tileset1.tsx"/>
  <layer id="1" name="Bg Layer" width="65" height="25">
   <data encoding="base64">
@@ -13,7 +13,7 @@
  </layer>
  <objectgroup id="3" name="objects">
   <object id="2" name="door" x="384" y="544" width="96" height="128"/>
-  <object id="3" name="consumable" type="coinBit" x="1728" y="568" width="32" height="32"/>
+  <object id="3" name="consumable" type="coinBit" x="1760" y="640" width="32" height="32"/>
   <object id="4" name="enemy" type="bit01" x="872" y="192">
    <properties>
     <property name="vertical" type="bool" value="true"/>
@@ -53,9 +53,6 @@
    </properties>
    <point/>
   </object>
-  <object id="11" name="Player" x="160" y="192">
-   <point/>
-  </object>
   <object id="12" name="wall" x="96" y="128" width="1120" height="32"/>
   <object id="13" name="wall" x="96" y="288" width="928" height="32"/>
   <object id="14" name="wall" x="96" y="128" width="32" height="192"/>
@@ -78,7 +75,7 @@
    </properties>
    <text fontfamily="Myanmar Text" pixelsize="33" wrap="1" color="#ffffff">Find the Decryptor and bring it to the white NET Gate to navigate the Cyber Realm!</text>
   </object>
-  <object id="27" name="key" x="1744" y="640">
+  <object id="27" name="key" x="1696" y="576">
    <point/>
   </object>
   <object id="28" name="text" x="160" y="328" width="888" height="51">
@@ -93,5 +90,11 @@
    </properties>
    <text fontfamily="Myanmar Text" pixelsize="33" wrap="1" color="#ffffff"> and obtain Credits</text>
   </object>
+  <object id="30" name="entrance" x="128" y="160" width="96" height="128"/>
+  <object id="35" name="consumable" type="coinBit" x="1088" y="280" width="32" height="32"/>
+  <object id="36" name="consumable" type="coinBit" x="1088" y="344" width="32" height="32"/>
+  <object id="37" name="consumable" type="coinBit" x="1088" y="408" width="32" height="32"/>
+  <object id="38" name="consumable" type="coinBit" x="1088" y="472" width="32" height="32"/>
+  <object id="39" name="consumable" type="coinBit" x="1088" y="536" width="32" height="32"/>
  </objectgroup>
 </map>

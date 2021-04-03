@@ -7,7 +7,6 @@ from objects import *
 class level:
     rendType = 0
     colliders = []
-    enemies = pygame.sprite.Group() #Deprecated
     width = winWidth
     height = winHeight
     levelSize = (width, height)
@@ -15,6 +14,7 @@ class level:
     mapDir = ''
 
     def __init__(self, **kwargs):
+        self.objects = pygame.sprite.Group() 
         for k, v in kwargs.items():
             self.__dict__[k] = v
 
@@ -60,13 +60,15 @@ class level:
         for tile_object in self.tmxdata.objects:
             if tile_object.name == 'key':
                 self.key = key1(self.game, (tile_object.x, tile_object.y))
+                self.objects.add(self.key)
 
             if tile_object.name == 'door':
                 self.door = door(self.game, (tile_object.x, tile_object.y, tile_object.width, tile_object.height))
-                
-            if tile_object.name == 'Player':
-                self.pStartX = int(tile_object.x)
-                self.pStartY = int(tile_object.y)
+                self.objects.add(self.door)
+
+            if tile_object.name == 'entrance':
+                self.entrance = entrance(self.game, (tile_object.x, tile_object.y, tile_object.width, tile_object.height))
+                self.objects.add(self.entrance)
 
             if tile_object.name == 'wall':
                 collider(self.game, (int(tile_object.x), int(tile_object.y), int(tile_object.width), int(tile_object.height)))
@@ -103,7 +105,9 @@ class level:
                     for obj in self.tmxdata.objects:
                         if obj.id == tile_object.target:
                             target = obj
-                    self.teleporters.add(tp1(self.game, (tile_object.x, tile_object.y), target))
+                    tp = tp1(self.game, (tile_object.x, tile_object.y), target)
+                    self.objects.add(tp)
+                    self.teleporters.add(tp)
             
             if tile_object.name == 'text':
                 text = fonts['3'].render(tile_object.text, True, (255, 255, 255))
@@ -197,4 +201,4 @@ level4 = level(
     mapDir = asset('Tiled/level4/level4.tmx')
 )
 ### All Game levels
-gameLevels = [level1, level2, level3,  level4,]
+gameLevels = [level1, level2, level3, level4,]

@@ -53,7 +53,6 @@ class player(pygame.sprite.Sprite):
             self.lastHit = pygame.time.get_ticks()
     #### Move Physics ####
     def move(self):
-        # print(self.ground)
         self.dir = pygame.math.Vector2((0, 0))
 
         ## Checks for left and right movement. They counterbalance if both are pressed.
@@ -72,7 +71,7 @@ class player(pygame.sprite.Sprite):
             self.dir.x = 0
 
         ## Calculates the Gravity and sets the yMod to going down
-        self.fall = 0.02*self.gravity
+        self.fall = 0.01*self.gravity
         ## min func limits the fall speed to yModMax
         self.yMod = min(self.yModMax, self.yMod+self.fall)
 
@@ -101,8 +100,6 @@ class player(pygame.sprite.Sprite):
             self.dir.y = 0
             self.yMod = 0
         
-
-        print(self.ground)
 
         self.rect.x += self.dir.x * self.vel
         self.rect.y += self.dir.y * self.vel

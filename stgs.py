@@ -65,3 +65,4 @@ def sAsset(assetName):
 
     return os.path.join(ASSETSPATH, 'sounds', assetName)
     
+DEBUG = True ## Not much use right now. Can be used to control try/except statement flows.
