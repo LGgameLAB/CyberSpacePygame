@@ -9,12 +9,12 @@ darkGreen = (0, 100, 0)
 yellow = (255,255,0)
 blue = (0, 0, 128)
 lightBlue = (0, 0, 255)
-red = (200, 0, 0 )
+red = (200, 0, 0)
 lightRed = (255, 100, 100)
 purple = (102, 0, 102)
 
 
-def dark(self, color, *args):
+def dark(color, *args):
     try:
         col2 = list(color)
     except:
@@ -25,9 +25,11 @@ def dark(self, color, *args):
     for val in col2:
         if val != 0:
             if args:
-                returnCol.append(val+args[0])
+                returnCol.append(max(val-args[0], 0))
             else:
-                returnCol.append(val*2)
+                returnCol.append(max(val/2, 0))
+        else:
+            returnCol.append(val)
     
     return tuple(returnCol)
 

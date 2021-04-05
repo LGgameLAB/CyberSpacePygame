@@ -27,6 +27,32 @@ class game:
     # Loads data for the game levels and the player
 
     def __init__(self):
+        self.layer1 = pygame.sprite.Group()
+        self.layer2 = pygame.sprite.Group()
+        self.fxLayer = pygame.sprite.Group()
+        self.overlayer = pygame.sprite.Group()
+        self.rendLayers = [self.layer1, self.layer2]
+        self.mixer = gameMixer()
+        self.mixer.setMusicVolume(0.07) # between 0 and 1
+        self.mixer.setFxVolume(0.07)
+
+        self.win = pygame.display.set_mode((winWidth, winHeight))
+        self.font1 = pygame.font.Font(os.path.join('fonts', 'YuseiMagic-Regular.ttf'), 30)
+        self.font2 = pygame.font.SysFont('Comic Sans MS', 23)
+        self.menuFont = pygame.font.Font(os.path.join('fonts', 'YuseiMagic-Regular.ttf'), 15)
+        self.gameOverFont = pygame.font.Font(os.path.join('fonts', 'YuseiMagic-Regular.ttf'), 60)
+        self.victoryFont = pygame.font.Font(os.path.join('fonts', 'YuseiMagic-Regular.ttf'), 72)
+        self.lastPause = pygame.time.get_ticks()
+        self.won = False
+        self.points = 0
+        self.gravity = 1.6
+        self.currentFps = 0
+        self.fullScreen = False
+        self.cam = cam(winWidth, winHeight)
+        self.clock = pygame.time.Clock()
+        self.new()
+
+    def new(self):
         self.enemies = pygame.sprite.Group()
         self.sprites = pygame.sprite.Group()
         self.pSprites = pygame.sprite.Group()
@@ -35,29 +61,6 @@ class game:
         self.pBullets = pygame.sprite.Group()
         self.eBullets = pygame.sprite.Group()   
         self.items = pygame.sprite.Group()
-        self.layer1 = pygame.sprite.Group()
-        self.layer2 = pygame.sprite.Group()
-        self.fxLayer = pygame.sprite.Group()
-        self.overlayer = pygame.sprite.Group()
-        self.rendLayers = [self.layer1, self.layer2]
-        self.mixer = gameMixer()
-
-        self.win = pygame.display.set_mode((winWidth, winHeight))
-        self.font1 = pygame.font.Font(os.path.join('fonts', 'YuseiMagic-Regular.ttf'), 30)
-        self.font2 = pygame.font.SysFont('Comic Sans MS', 23)
-        self.menuFont = pygame.font.Font(os.path.join('fonts', 'YuseiMagic-Regular.ttf'), 15)
-        self.pause = False
-        self.lastPause = pygame.time.get_ticks()
-        self.loop = 0
-        self.points = 0
-        self.gravity = 1.6
-        self.currentFps = 0
-        self.fullScreen = False
-        self.cam = cam(winWidth, winHeight)
-        self.clock = pygame.time.Clock()
-        self.loadData()
-
-    def loadData(self):
         self.levels = gameLevels
         self.player = player(self, asset('Space-ManR.png'), 'Space Man', imgSheet = 
             {'active': True, ## Will become deprecated but is usefulin current development. Allows use of sample image.
@@ -69,11 +72,19 @@ class game:
             'flyL': asset('player/flyL.png')})
             
         self.player.gravity = self.gravity
+        self.end = False
+        self.pause = False
 
     ####  Determines how the run will function ####
     def run(self):
         self.menuLoop()
+        self.mixer.playMusic(asset('sounds/track 1.wav'))
         self.mainLoop()
+        self.mixer.stop()
+        if self.won:
+            self.victoryLoop()
+        else:
+            self.gameOver()
 
     #### Controls how the levels will load ####
     def loadLevel(self, levelNum, *args):   
@@ -114,22 +125,26 @@ class game:
             
 
         else:
-            self.level = level(rendType=1, mapDir=importLevel(args[0]))
-            self.level.load(self)
+            levelDir = importLevel(args[0])
+            if levelDir is None:
+                self.reset()
+            else:
+                self.level = level(rendType=1, mapDir=levelDir)
+                self.level.load(self)
 
-            self.cam.width, self.cam.height = self.level.rect.width, self.level.rect.height
+                self.cam.width, self.cam.height = self.level.rect.width, self.level.rect.height
 
-            try:
-                self.player.rect.topleft = self.level.entrance.rect.center
-            except:
-                print("No player Pos")
+                try:
+                    self.player.rect.topleft = self.level.entrance.rect.center
+                except:
+                    print("No player Pos")
+                    self.reset()
 
     #### Main game loop ####
     def mainLoop(self):
         
-        while True:
-            self.loop += 1
-            self.clock.tick(60)
+        while not self.end:
+            self.clock.tick(FPS)
             self.refresh()
 
             ##Updates Game
@@ -229,25 +244,36 @@ class game:
         if pygame.sprite.collide_rect(self.player, self.level.door) and self.level.keyObtained:
             self.pause = True
             fadeOut(self, speed = 8, alpha = 40, onEnd = lambda:self.nextLevel())
+        
+        if self.player.health <= 0:
+            self.end = True
+
     def unPause(self):
         self.pause = False
 
+    def reset(self):
+        for sprite in self.sprites:
+            sprite.kill()
+        for sprite in self.pSprites:
+            sprite.kill()
+        self.new()
+        self.run()
+
     def nextLevel(self):
-        
         if DEBUG:
             try:
                 self.loadLevel(self.levels.index(self.level) + 2)
                 fadeIn(self, speed = 20, onEnd = lambda:self.unPause())
             except IndexError:
-                self.loadData()
-                self.run()
+                self.end = True
+                self.won = True
         else:
             try:
                 self.loadLevel(self.levels.index(self.level) + 2)
                 fadeIn(self, onEnd = lambda:self.unPause())
             except:
-                self.loadData()
-                self.run()
+                self.end = True
+                self.won = True
 
     def quit(self):
         pygame.quit()
@@ -269,14 +295,8 @@ class game:
                         self.quit()
 
     def getFps(self):
-        if self.loop > 1:
-            if self.loop == 2:
-                self.lastFrame = pygame.time.get_ticks()
-            
-            else:
-                newFrame = pygame.time.get_ticks()
-                self.currentFps = 1/((newFrame-self.lastFrame)/1000) 
-                self.lastFrame = newFrame
+        self.currentFps = self.clock.get_fps() 
+        return self.currentFps
                 
     def getFullScreen(self):
         keys = pygame.key.get_pressed()
@@ -338,10 +358,56 @@ class game:
                 break
             
             pygame.display.update()
-    
+
+    def victoryLoop(self):
+        menuButton = button(self, (winWidth/2, winHeight/2), text="Back to Menu", center = True, colors = (colors.yellow, colors.white))
+        buttons = pygame.sprite.Group(menuButton)
+        while True:
+            pygame.time.delay(50)
+            
+            self.runEvents()
+            self.refresh()
+
+            buttons.update()
+            for btn in buttons:
+                self.win.blit(btn.image, btn.rect)
+
+            if menuButton.clicked:
+                self.reset()
+                break
+            
+            text1 = self.victoryFont.render('Victory', True, colors.yellow, 20)
+            
+            self.win.blit(text1, (winWidth/2 - text1.get_width()/2 ,30))
+            
+            pygame.display.update()
+
+    def gameOver(self):
+        restartButton = button(self, (winWidth/2, winHeight/2), text="Back to Menu", center = True, colors = (colors.yellow, colors.white))
+        buttons = pygame.sprite.Group(restartButton)
+        while True:
+            pygame.time.delay(50)
+            
+            self.runEvents()
+            self.refresh()
+
+            buttons.update()
+            for btn in buttons:
+                self.win.blit(btn.image, btn.rect)
+
+            if restartButton.clicked:
+                self.reset()
+                break
+            
+            text1 = self.gameOverFont.render('Game Over', True, colors.dark(colors.red, 20))
+            
+            self.win.blit(text1, (50,50))
+            
+            pygame.display.update()
     def refresh(self):
         self.win.fill((0, 0, 0))
 
 #### Creates and runs game ####
 game1 = game()
-game1.run()
+while __name__ == '__main__':
+    game1.run()

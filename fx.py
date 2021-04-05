@@ -27,7 +27,6 @@ class fadeOut(pygame.sprite.Sprite):
         
 
     def update(self):
-        print(self.alpha)
         if self.alpha > 220:
             if self.fadeBack:
                 fadeIn(self.game)
@@ -39,7 +38,6 @@ class fadeOut(pygame.sprite.Sprite):
 
     def end(self):   
         if self.onEnd:
-            print('nani')
             self.onEnd()
         self.kill()
 
@@ -72,7 +70,6 @@ class fadeIn(pygame.sprite.Sprite):
 
     def end(self):   
         if self.onEnd:
-            print('nani')
             self.onEnd()
         self.kill()
 

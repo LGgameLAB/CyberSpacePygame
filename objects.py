@@ -297,16 +297,15 @@ class gun(pygame.sprite.Sprite):
 
     #### Checks for bullet fire ####
     def checkFire(self):   ## This got complicated so I will break it down
-        for event in self.game.events:
-            if event.type == pygame.MOUSEBUTTONUP:  ## Checks on click release
-                mPos = pygame.Vector2(pygame.mouse.get_pos())  ## Gets mouse position and stores it in vector. This will be translated into the vector that moves the bullet
-                pPos = self.game.cam.apply(self.player)  ## Gets actual position of player on screen
-                mPos.x -= pPos.centerx ## Finds the x and y relativity between the mouse and player and then calculates the offset
-                mPos.y -= pPos.centery
-                self.setAngle(False)
-                self.fire(mPos) ## Inputs values. Notice how I used rect.center instead of pPos.
-                self.lastFire = pygame.time.get_ticks()
-                self.game.mixer.playFx(sAsset('sfx1.wav'))
+        if pygame.mouse.get_pressed()[0]: ## Checks on click 
+            mPos = pygame.Vector2(pygame.mouse.get_pos())  ## Gets mouse position and stores it in vector. This will be translated into the vector that moves the bullet
+            pPos = self.game.cam.apply(self.player)  ## Gets actual position of player on screen
+            mPos.x -= pPos.centerx ## Finds the x and y relativity between the mouse and player and then calculates the offset
+            mPos.y -= pPos.centery
+            self.setAngle(False)
+            self.fire(mPos) ## Inputs values. Notice how I used rect.center instead of pPos.
+            self.lastFire = pygame.time.get_ticks()
+            self.game.mixer.playFx('gunFx1')
     
     def fire(self, mPos):
         bullet(self.game, self.rect.center, mPos, self.angle)

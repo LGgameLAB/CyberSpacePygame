@@ -10,6 +10,9 @@ ASSETSPATH = os.path.join(PATH, 'assets')
 CAMLIMIT = True
 SHOWFPS = True
 
+#### FPS BOIS ####
+FPS = 60
+
 #### Returns the asset's path ####
 def asset(assetName):
     global ASSETSPATH
