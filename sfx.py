@@ -51,7 +51,7 @@ class gameMixer:
 
     def playMusic(self, sfile):
         sound = pygame.mixer.Sound(sfile)
-        self.musicChannel.play(sound, 0)
+        self.musicChannel.play(sound, -1)
     
     def stop(self):
         pygame.mixer.stop()

@@ -8,6 +8,7 @@ class animation:
         self.sprite = sprite
         self.loadSheet()
         self.framex = 0
+        self.delay = 120
         self.cycle = False
         self.dir = 'idleR'
         self.lastTick = pygame.time.get_ticks()
@@ -47,12 +48,12 @@ class animation:
         
     def update(self):
         self.getStrDir()
-        if self.framex >= int(self.imgSheet[self.dir].width - self.tileWidth):
-            self.framex = 0
-        else:
-            if pygame.time.get_ticks() - self.lastTick >= 120:
-                self.framex += self.tileWidth
-                self.lastTick = pygame.time.get_ticks()
+
+        if pygame.time.get_ticks() - self.lastTick >= self.delay:
+            self.framex += self.tileWidth
+            self.lastTick = pygame.time.get_ticks()
+            if self.framex > int(self.imgSheet[self.dir].width - self.tileWidth):
+                self.framex = 0
         try:
             if self.sprite.imgSheet['active']:
                 self.sprite.image = self.imgSheet[self.dir].get_image(self.framex, 0, self.tileWidth, self.tileHeight)

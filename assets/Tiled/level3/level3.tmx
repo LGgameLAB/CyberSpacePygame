@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.4" tiledversion="1.4.1" orientation="orthogonal" renderorder="right-down" width="100" height="56" tilewidth="32" tileheight="32" infinite="0" nextlayerid="4" nextobjectid="149">
+<map version="1.4" tiledversion="1.4.1" orientation="orthogonal" renderorder="right-down" width="100" height="56" tilewidth="32" tileheight="32" infinite="0" nextlayerid="4" nextobjectid="158">
  <tileset firstgid="1" source="../cyber_space_tileset1.tsx"/>
  <tileset firstgid="5" source="../cyber_space_tileset2.tsx"/>
  <layer id="1" name="Tile Layer 1" width="100" height="56">
@@ -109,9 +109,6 @@
   <object id="61" name="wall" x="3104" y="640" width="64" height="32"/>
   <object id="62" name="wall" x="2880" y="1344" width="160" height="32"/>
   <object id="63" name="enemy" type="bit02" x="1384" y="144">
-   <point/>
-  </object>
-  <object id="64" name="enemy" type="bit02" x="1840" y="464">
    <point/>
   </object>
   <object id="65" name="enemy" type="bit02" x="2048" y="192">
@@ -234,9 +231,6 @@
   <object id="107" name="enemy" type="bit02" x="1056" y="480">
    <point/>
   </object>
-  <object id="108" name="enemy" type="bit02" x="2336" y="96">
-   <point/>
-  </object>
   <object id="109" name="enemy" type="bit02" x="2304" y="512">
    <point/>
   </object>
@@ -270,5 +264,59 @@
   <object id="145" name="door" x="3072" y="928" width="96" height="128"/>
   <object id="146" name="wall" x="992" y="224" width="160" height="32"/>
   <object id="148" name="entrance" x="544" y="928" width="96" height="128"/>
+  <object id="149" name="enemy" type="bit01" x="352" y="256">
+   <properties>
+    <property name="vertical" type="bool" value="true"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="150" name="enemy" type="bit01" x="32" y="352">
+   <properties>
+    <property name="vertical" type="bool" value="false"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="151" name="enemy" type="bit01" x="640" y="480">
+   <properties>
+    <property name="vertical" type="bool" value="false"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="152" name="enemy" type="bit01" x="352" y="544">
+   <properties>
+    <property name="vertical" type="bool" value="false"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="153" name="enemy" type="bit01" x="352" y="608">
+   <properties>
+    <property name="vertical" type="bool" value="false"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="154" name="enemy" type="bit01" x="192" y="672">
+   <properties>
+    <property name="vertical" type="bool" value="false"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="155" name="enemy" type="bit01" x="416" y="640">
+   <properties>
+    <property name="vertical" type="bool" value="false"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="156" name="enemy" type="bit01" x="64" y="832">
+   <properties>
+    <property name="vertical" type="bool" value="false"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="157" name="enemy" type="bit01" x="512" y="896">
+   <properties>
+    <property name="vertical" type="bool" value="false"/>
+   </properties>
+   <point/>
+  </object>
  </objectgroup>
 </map>

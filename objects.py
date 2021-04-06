@@ -22,7 +22,7 @@ class mPlatform(pygame.sprite.Sprite):
     vel = 5
     color = (255, 255, 255)
     def __init__(self, game, rect, **kwargs):
-        self.groups = game.colliders, game.sprites, game.layer1
+        self.groups = game.colliders, game.sprites, game.layer2
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.game = game
         self.rect = pygame.Rect(rect)
@@ -42,11 +42,6 @@ class mPlatform(pygame.sprite.Sprite):
         #self.movePlayer()
         self.rect.x, self.rect.y = self.pos
     
-    def movePlayer(self):
-        if self.rect.colliderect(self.game.player.rect):
-            print('nani')
-            self.game.player.pos += self.dir * self.vel
-
     def move(self):
         testVec = pygame.Vector2((self.pos.x, self.pos.y))
         if self.collideCheck(pygame.Vector2(testVec.x+(self.dir.x*self.vel), testVec.y)):
@@ -72,13 +67,12 @@ class mPlatform(pygame.sprite.Sprite):
                 self.dir = self.dir.reflect((0, 1))
         
         self.pos.y += self.dir.y*self.vel
-        # If we hit player move the player
-        # if not self.player.dir.y == 0:
-        #     if self.rect.colliderect(self.player.rect):
-        #         if self.dir.y < 0:
-        #             self.player.rect.bottom = self.rect.top
-        #         else:
-        #             self.player.rect.top = self.rect.bottom
+        testRect = pygame.Rect(self.pos.x, self.pos.y, self.rect.width, self.rect.height)
+        if testRect.colliderect(self.player.rect):
+            if self.dir.y < 0:
+                self.player.rect.bottom = self.rect.top
+            else:
+                self.player.rect.top = self.rect.bottom
 
     def collideCheck(self, vector):
             returnVal = False

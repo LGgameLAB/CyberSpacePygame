@@ -89,7 +89,8 @@ class level:
                 if tile_object.type == 'bossyBit':
                     bossyBit(self.game, (tile_object.x, tile_object.y))
                 
-            
+                if tile_object.type == 'turret1':
+                    turret1(self.game, (tile_object.x, tile_object.y), False)
             if tile_object.name == 'consumable':
                 if tile_object.type == 'massFireGun':
                     massFireGunConsumable(self.game, (tile_object.x, tile_object.y))
@@ -201,4 +202,4 @@ level4 = level(
     mapDir = asset('Tiled/level4/level4.tmx')
 )
 ### All Game levels
-gameLevels = [level1, level2, level3, level4,]
+gameLevels = [level4, level1, level2, level3, ]
