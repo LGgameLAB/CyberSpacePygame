@@ -1,10 +1,14 @@
 #### Imports ####
 
-import pygame
 import math
-from stgs import *
+
+import pygame
+
 from animations import *
 from objects import *
+from stgs import *
+
+
 #### Player object ####
 class player(pygame.sprite.Sprite):
     x = 71
@@ -46,6 +50,7 @@ class player(pygame.sprite.Sprite):
     def update(self):
         self.move()
         self.animations.update()
+        #print(self.animations.dir)
     
     def takeDamage(self, damage):
         if pygame.time.get_ticks() - self.lastHit >= self.hitCooldown:
@@ -55,20 +60,7 @@ class player(pygame.sprite.Sprite):
     def move(self):
         self.dir = pygame.math.Vector2((0, 0))
 
-        ## Checks for left and right movement. They counterbalance if both are pressed.
-        if checkKey(keySet['pRight']):
-            self.dir.x += 1
-        if checkKey(keySet['pLeft']):
-            self.dir.x -= 1
         
-        ## Checks collision after horizontal movement
-        collide = self.collideCheck()
-        if collide:
-            if self.dir.x > 0:
-                self.rect.right = collide.left
-            else: 
-                self.rect.left = collide.right
-            self.dir.x = 0
 
         ## Calculates the Gravity and sets the yMod to going down
         self.fall = 0.01*self.gravity
@@ -100,6 +92,20 @@ class player(pygame.sprite.Sprite):
             self.dir.y = 0
             self.yMod = 0
         
+        ## Checks for left and right movement. They counterbalance if both are pressed.
+        if checkKey(keySet['pRight']):
+            self.dir.x += 1
+        if checkKey(keySet['pLeft']):
+            self.dir.x -= 1
+        
+        ## Checks collision after horizontal movement
+        collide = self.collideCheck()
+        if collide:
+            if self.dir.x > 0:
+                self.rect.right = collide.left
+            else: 
+                self.rect.left = collide.right
+            self.dir.x = 0
 
         self.rect.x += self.dir.x * self.vel
         self.rect.y += self.dir.y * self.vel

@@ -174,7 +174,7 @@ class teleporter(pygame.sprite.Sprite):
         self.rect = pygame.Rect(self.pos.x, self.pos.y, self.image.get_width(), self.image.get_height())
 
 class button(pygame.sprite.Sprite):
-    rect = (0, 0, 162, 20)
+    rect = (0, 0, 200, 60)
     #          Normal           Selected
     colors = ((50, 255, 255), (255, 255, 255))
     spriteInit = False
@@ -264,6 +264,8 @@ class gun(pygame.sprite.Sprite):
     y = 0
     rect = pygame.Rect(x, y, 64, 64)
     damage = 5
+    speed = 10
+    moveDist = 20
     reloadTime = 200
     imgSource = ''
     def __init__(self, game, image, player, **kwargs):
@@ -282,13 +284,22 @@ class gun(pygame.sprite.Sprite):
             self.__dict__[k] = v
     
     def update(self):
-        self.pos = pygame.Vector2(self.player.rect.center)
+        self.move()
         self.rect.center = self.pos
         self.rect.x += 20
         self.setAngle()
         if pygame.time.get_ticks() - self.lastFire >= self.reloadTime:
             self.checkFire()
 
+    def move(self):
+        pPos = pygame.Vector2(self.player.rect.center)
+        if dist(self.pos, pPos) >= self.moveDist:
+            vel = pygame.Vector2(self.pos.x-pPos.x, self.pos.y-pPos.y).normalize()
+            self.pos += -vel*self.speed
+    
+    def recenter(self):
+        self.pos = pygame.Vector2(self.player.rect.center)
+            
     #### Checks for bullet fire ####
     def checkFire(self):   ## This got complicated so I will break it down
         if pygame.mouse.get_pressed()[0]: ## Checks on click 

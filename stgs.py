@@ -1,6 +1,7 @@
 import os
 import pygame
 import colors
+import math
 
 #### Establishes file paths ####
 PATH = os.path.dirname(os.path.abspath(__file__))
@@ -69,3 +70,8 @@ def sAsset(assetName):
     return os.path.join(ASSETSPATH, 'sounds', assetName)
     
 DEBUG = True ## Not much use right now. Can be used to control try/except statement flows.
+
+def dist(vec1, vec2):
+    dist1 = (vec1.x-vec2.x)**2
+    dist2 = (vec1.y-vec2.y)**2
+    return math.sqrt(dist1+dist2)

@@ -125,7 +125,11 @@ class game:
             
 
         else:
-            levelDir = importLevel(args[0])
+            if args[0] is None:
+                levelDir = importLevelFile()
+            else:
+                levelDir = importLevel(args[0])
+
             if levelDir is None:
                 self.reset()
             else:
@@ -139,6 +143,8 @@ class game:
                 except:
                     print("No player Pos")
                     self.reset()
+
+        self.player.gun.recenter()
 
     #### Main game loop ####
     def mainLoop(self):
@@ -232,6 +238,7 @@ class game:
         for tp in tpCols:
             fadeOut(self, speed = 20, alpha = 120, fadeBack = True)
             self.player.rect.topleft = tp.target
+            self.player.gun.recenter()
 
         ### DEcryptor/key collision detection
         try:
@@ -322,9 +329,10 @@ class game:
     #### First menu loop ####
     def menuLoop(self):
         run = True
-        startButton = button(self, (winWidth/2, 140), text="Start", center = True)
-        loadCustomLevelBtn = button(self, (winWidth/2, 100), text="Load Custom Level", center = True)
-        buttons = pygame.sprite.Group(startButton, loadCustomLevelBtn)
+        startButton = button(self, (winWidth/2, 100), text="Start", center = True)
+        loadCustomLevelBtn = button(self, (winWidth/2, 180), text="Load Custom Level (web)", center = True)
+        loadCustomLevelBtn2 = button(self, (winWidth/2, 260), text="Load Custom Level (file)", center = True)
+        buttons = pygame.sprite.Group(startButton, loadCustomLevelBtn, loadCustomLevelBtn2)
         while run:
             pygame.time.delay(50)
             
@@ -342,14 +350,18 @@ class game:
             if loadCustomLevelBtn.clicked:
                 self.loadLevel(None, pyperclip.paste())
                 break
+
+            if loadCustomLevelBtn2.clicked:
+                self.loadLevel(None, None)
+                break
             
-            text1 = self.font1.render('Press S to Start', True, (50, 255, 255))
+            text1 = self.font2.render('Press S to Start', True, (50, 255, 255))
             text2 = self.font1.render('Welcome to Cyber Space', True, (50, 255, 255))
             text3 = self.font1.render('Created by Luke Gonsalves', True, (50, 255, 255))
             
             self.win.blit(text1, (30,30))
-            self.win.blit(text2, (300, 300))
-            self.win.blit(text3, (310, 400))
+            self.win.blit(text2, (100, 200))
+            self.win.blit(text3, (100, 300))
 
             keys = pygame.key.get_pressed()
 

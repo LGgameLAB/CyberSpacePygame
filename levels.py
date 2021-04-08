@@ -163,9 +163,20 @@ def importLevel(link):
     else:
         print("map does not exist")
         return
-            
 
 
+def importLevelFile():
+    import tkinter as tk
+    from tkinter import filedialog
+    import os
+
+    root = tk.Tk()
+    root.withdraw() #use to hide tkinter window
+
+    currdir = os.getcwd()
+    tempdir = filedialog.askopenfile(parent=root, initialdir=currdir, title='Please select a directory')
+
+    return tempdir.name
 #### Level creation
 ## Sample levl
 # LEVEL1 = level(
@@ -202,4 +213,4 @@ level4 = level(
     mapDir = asset('Tiled/level4/level4.tmx')
 )
 ### All Game levels
-gameLevels = [level4, level1, level2, level3, ]
+gameLevels = [level1, level2, level3, level4,]

@@ -68,6 +68,7 @@ class animation:
         ### Get the last specific direction
         
         lastDir = ''
+        fullLastDir = self.dir
         if len(self.dir) == 1:
             lastDir = self.dir
         elif self.dir[0:4] == 'idle':
@@ -101,3 +102,7 @@ class animation:
                 self.dir = 'idle' + lastDir.capitalize()
             else:
                 self.dir = lastDir.lower()
+        
+        if not self.dir == fullLastDir:
+            self.framex = 0
+            print('yeet?')
