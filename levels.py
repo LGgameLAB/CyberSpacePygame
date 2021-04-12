@@ -111,7 +111,7 @@ class level:
                     self.teleporters.add(tp)
             
             if tile_object.name == 'text':
-                text = fonts['3'].render(tile_object.text, True, (255, 255, 255))
+                text = fonts['3'].render(tile_object.text, self.game.antialiasing, (255, 255, 255))
                 self.image.blit(text, (tile_object.x, tile_object.y))
 
             if tile_object.name == 'dmgRect':

@@ -19,12 +19,12 @@ class player(pygame.sprite.Sprite):
     lastHit = 0
     roomBound = False
     imgSheet = {'active': False, 'tileWidth': 64, 'r': False, 'l': False, 'idleR': False, 'flyR': False, 'flyL': False}
-    width, height = 48, 64
+    width, height = 36, 64
     health = 50
     maxHp = 50
     #### Player Initializations ####
     def __init__(self, game, image, name, **kwargs):
-        self.groups = game.sprites, game.layer2
+        self.groups = [game.sprites, game.layer2]
         pygame.sprite.Sprite.__init__(self, self.groups)
 
         self.game = game

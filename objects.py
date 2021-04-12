@@ -185,19 +185,21 @@ class button(pygame.sprite.Sprite):
     def __init__(self, game, pos,**kwargs):
         self.game = game
         
+        self.onClick = False
+        self.groups = []
+        self.addGroups = []
         for k, v in kwargs.items():
             self.__dict__[k] = v
+        
+        self.groups = self.groups + self.addGroups
 
-        if self.spriteInit:
-            pygame.sprite.Sprite.__init__(self, self.groups)
-        else:
-            pygame.sprite.Sprite.__init__(self)
+        pygame.sprite.Sprite.__init__(self, self.groups)
 
         self.rect = pygame.Rect(self.rect)
         self.rect.x, self.rect.y = pos
         self.image = pygame.Surface(self.rect.size)
 
-        self.rendText = self.game.menuFont.render(self.text, True, (0, 0, 0))
+        self.rendText = self.game.menuFont.render(self.text, self.game.antialiasing, (0, 0, 0))
         self.textRect = self.rendText.get_rect()
         if self.center:
             self.textRect.center = pygame.Rect(0, 0, self.rect.width, self.rect.height).center
@@ -218,12 +220,80 @@ class button(pygame.sprite.Sprite):
             for event in self.game.events:
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     self.clicked = True
+                    if self.onClick:
+                        self.onClick()
+
             self.image.fill(self.colors[1])
         else:
             self.image.fill(self.colors[0])
         
         self.image.blit(self.rendText, self.textRect)
+
+class settingSlider(pygame.sprite.Sprite):
+    
+    def __init__(self, game, pos,**kwargs):
+        self.game = game
+        self.rect = (0, 0, 200, 60)
+        self.sliderRect = (0, 0, 20, 10)
+        self.bgColor = colors.black
+        #          line (normal)           Rect
+        self.colors = ((50, 255, 255), colors.yellow, (255, 255, 255))
+        self.clicked = False
+        self.spriteInit = False
+        self.text = ''
+        self.center = False
+
+        self.groups = []       ## These few lines are the lines for component objects
+        self.addGroups = []
+        for k, v in kwargs.items():
+            self.__dict__[k] = v
         
+        self.groups = self.groups + self.addGroups
+        pygame.sprite.Sprite.__init__(self, self.groups)
+
+        self.rect = pygame.Rect(self.rect)
+        self.rect.x, self.rect.y = pos
+        self.image = pygame.Surface(self.rect.size)
+        self.sliderRect = pygame.Rect(self.sliderRect)
+        self.sliderRect.centery = self.rect.height/2
+        self.sliderRect.x = self.rect.width - self.sliderRect.width
+
+    def reset(self):
+        self.sliderRect = pygame.Rect(self.sliderRect)
+        self.sliderRect.centery = self.rect.height/2
+        self.sliderRect.x = self.rect.width - self.sliderRect.width
+    
+    def update(self):
+        if self.clicked:
+            if not pygame.mouse.get_pressed()[0]:  
+               self.clicked = False
+            else:
+                self.sliderRect.x = min(self.rect.right-self.sliderRect.width, pygame.mouse.get_pos()[0]-self.sliderRect.width) - self.rect.x
+                self.sliderRect.x = max(0, self.sliderRect.x)
+        else:
+            self.checkClicked()
+        
+        self.render()
+    
+    def get_ratio(self):
+        return self.sliderRect.x/(self.rect.width-self.sliderRect.width)
+    
+    def setRatio(self, percent): # Set between 0 & 1
+        self.sliderRect.x = (self.rect.width-self.sliderRect.width)*percent
+
+    def render(self):
+        self.image.fill(self.bgColor)
+        pygame.draw.line(self.image, self.colors[1],(0, self.rect.height/2), (self.sliderRect.centerx, self.rect.height/2), 4)
+        pygame.draw.line(self.image, self.colors[0],(self.sliderRect.centerx, self.rect.height/2), (self.rect.width, self.rect.height/2), 4)
+        pygame.draw.rect(self.image, self.colors[2], self.sliderRect)
+
+    
+    def checkClicked(self):
+        if pygame.mouse.get_pressed()[0]: 
+            mouseRect = pygame.Rect(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1], 1, 1)
+            if mouseRect.colliderect(self.rect):
+                self.clicked = True
+
 class consumable(pygame.sprite.Sprite):
     imgSheet = {'active': False, 'static': True,'tileWidth': 32}
     image = pygame.Surface((imgSheet['tileWidth'], imgSheet['tileWidth']))

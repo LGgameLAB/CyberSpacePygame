@@ -14,7 +14,9 @@ from objects import *
 from player import *
 from sfx import *
 from stgs import *
-
+from overlay import *
+loadSave(saveFile)
+from stgs import *
 
 #### Game object ####
 class game:
@@ -33,8 +35,9 @@ class game:
         self.overlayer = pygame.sprite.Group()
         self.rendLayers = [self.layer1, self.layer2]
         self.mixer = gameMixer()
-        self.mixer.setMusicVolume(0.07) # between 0 and 1
-        self.mixer.setFxVolume(0.07)
+        self.mixer.setMusicVolume(musicVolume) # between 0 and 1
+        self.mixer.setFxVolume(fxVolume)
+        self.antialiasing = aalias
 
         self.win = pygame.display.set_mode((winWidth, winHeight))
         self.font1 = pygame.font.Font(os.path.join('fonts', 'YuseiMagic-Regular.ttf'), 30)
@@ -47,6 +50,7 @@ class game:
         self.points = 0
         self.gravity = 1.6
         self.currentFps = 0
+        self.showFps = SHOWFPS
         self.fullScreen = False
         self.cam = cam(winWidth, winHeight)
         self.clock = pygame.time.Clock()
@@ -62,18 +66,20 @@ class game:
         self.eBullets = pygame.sprite.Group()   
         self.items = pygame.sprite.Group()
         self.levels = gameLevels
-        self.player = player(self, asset('Space-ManR.png'), 'Space Man', imgSheet = 
+        self.player = player(self, asset('Space-ManR.png'), 'Cyber Man', imgSheet = 
             {'active': True, ## Will become deprecated but is usefulin current development. Allows use of sample image.
             'tileWidth': 64, 
-            'r': asset('player/idleR.png'), 
-            'l': asset('player/idleL.png'), 
-            'idleR': asset('player/idleR.png'), 
+            'r': asset('player/idleR(2).png'), 
+            'l': asset('player/idleL(2).png'), 
+            'idleR': asset('player/idleR(2).png'), 
+            'idleL': asset('player/idleL(2).png'),
             'flyR': asset('player/flyR.png'), 
             'flyL': asset('player/flyL.png')})
             
         self.player.gravity = self.gravity
         self.end = False
         self.pause = False
+        self.pauseScreen = pauseOverlay(self)
 
     ####  Determines how the run will function ####
     def run(self):
@@ -163,6 +169,7 @@ class game:
         self.getPause()
         if self.pause:
             self.pSprites.update()
+            self.pauseScreen.update()
         else:
             self.sprites.update()
             self.checkHits()
@@ -190,12 +197,12 @@ class game:
             self.win.blit(sprite.image, sprite.rect)
         
         
-        if SHOWFPS:
-            fpsText = self.font2.render(str(self.currentFps), True, (255, 255, 255))
+        if self.showFps:
+            fpsText = fonts['6'].render(str(self.currentFps), self.antialiasing, (255, 255, 255))
             self.win.blit(fpsText, (1100, 5))
         
-        visPoints = self.font2.render(str(self.points), False, (255, 255, 255))
-        self.win.blit(visPoints, (winWidth/2 - 100, 5))
+        visPoints = fonts['6'].render("Score: " + str(self.points), self.antialiasing, (255, 255, 255))
+        self.win.blit(visPoints, (100, 20))
 
     def checkHits(self):
         ### Checks for bullet collision among enemies and bullets
@@ -257,6 +264,8 @@ class game:
 
     def unPause(self):
         self.pause = False
+        self.pauseScreen.deactivate()
+        self.overlayer.remove(self.pauseScreen)
 
     def reset(self):
         for sprite in self.sprites:
@@ -283,6 +292,7 @@ class game:
                 self.won = True
 
     def quit(self):
+        saveData(saveFile, self)
         pygame.quit()
         sys.exit()
 
@@ -304,7 +314,21 @@ class game:
     def getFps(self):
         self.currentFps = self.clock.get_fps() 
         return self.currentFps
-                
+    
+    def toggleFps(self):
+        if self.showFps:
+            self.showFps = False
+        else:
+            self.showFps = True
+
+    def toggleAalias(self):
+        if self.antialiasing:
+            self.antialiasing = False
+        else:
+            self.antialiasing = True
+        
+        self.pauseScreen.loadComponents()
+
     def getFullScreen(self):
         keys = pygame.key.get_pressed()
         if keys[keySet['fullScreen']]:
@@ -321,9 +345,12 @@ class game:
             keys = pygame.key.get_pressed()
             if keys[keySet['pause']]:
                 if self.pause:
-                    self.pause = False
+                    self.unPause()
                 else:
                     self.pause = True
+                    self.overlayer.add(self.pauseScreen)
+                    self.pauseScreen.activate()
+
                 self.lastPause = pygame.time.get_ticks()
 
     #### First menu loop ####
@@ -332,16 +359,17 @@ class game:
         startButton = button(self, (winWidth/2, 100), text="Start", center = True)
         loadCustomLevelBtn = button(self, (winWidth/2, 180), text="Load Custom Level (web)", center = True)
         loadCustomLevelBtn2 = button(self, (winWidth/2, 260), text="Load Custom Level (file)", center = True)
-        buttons = pygame.sprite.Group(startButton, loadCustomLevelBtn, loadCustomLevelBtn2)
+        #slider1 = settingSlider(self, (800, 600)) 
+        comps = pygame.sprite.Group(startButton, loadCustomLevelBtn, loadCustomLevelBtn2) # Stands for components fyi
         while run:
             pygame.time.delay(50)
             
             self.runEvents()
             self.refresh()
 
-            buttons.update()
-            for btn in buttons:
-                self.win.blit(btn.image, btn.rect)
+            comps.update()
+            for comp in comps:
+                self.win.blit(comp.image, comp.rect)
 
             if startButton.clicked:
                 self.loadLevel(1)
@@ -355,9 +383,9 @@ class game:
                 self.loadLevel(None, None)
                 break
             
-            text1 = self.font2.render('Press S to Start', True, (50, 255, 255))
-            text2 = self.font1.render('Welcome to Cyber Space', True, (50, 255, 255))
-            text3 = self.font1.render('Created by Luke Gonsalves', True, (50, 255, 255))
+            text1 = self.font2.render('Press S to Start', self.antialiasing, (50, 255, 255))
+            text2 = self.font1.render('Welcome to Cyber Space', self.antialiasing, (50, 255, 255))
+            text3 = self.font1.render('Created by Luke Gonsalves', self.antialiasing, (50, 255, 255))
             
             self.win.blit(text1, (30,30))
             self.win.blit(text2, (100, 200))
@@ -370,6 +398,7 @@ class game:
                 break
             
             pygame.display.update()
+        
 
     def victoryLoop(self):
         menuButton = button(self, (winWidth/2, winHeight/2), text="Back to Menu", center = True, colors = (colors.yellow, colors.white))
@@ -388,7 +417,7 @@ class game:
                 self.reset()
                 break
             
-            text1 = self.victoryFont.render('Victory', True, colors.yellow, 20)
+            text1 = self.victoryFont.render('Victory', self.antialiasing, colors.yellow, 20)
             
             self.win.blit(text1, (winWidth/2 - text1.get_width()/2 ,30))
             
@@ -411,11 +440,12 @@ class game:
                 self.reset()
                 break
             
-            text1 = self.gameOverFont.render('Game Over', True, colors.dark(colors.red, 20))
+            text1 = self.gameOverFont.render('Game Over', self.antialiasing, colors.dark(colors.red, 20))
             
             self.win.blit(text1, (50,50))
             
             pygame.display.update()
+
     def refresh(self):
         self.win.fill((0, 0, 0))
 

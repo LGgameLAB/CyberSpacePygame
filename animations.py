@@ -4,6 +4,7 @@ from stgs import *
 class animation:
     #### Intializes first by grabbing sprite, sprite imgsheet data, and calculating a dir str ####
     ## Full image sheet can contain: 'active', 'tileWidth', 'tileHeight', 'r', 'l', 'idleR', 'idleL','flyR', 'flyL'
+    ## Warning! Never use black RBG(0, 0, 0) on a sprite sheet! It will become transparent! If you want black use a similar color ex. RGB(1, 0, 0)
     def __init__(self, sprite):
         self.sprite = sprite
         self.loadSheet()
@@ -105,4 +106,3 @@ class animation:
         
         if not self.dir == fullLastDir:
             self.framex = 0
-            print('yeet?')

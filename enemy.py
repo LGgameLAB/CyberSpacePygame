@@ -77,6 +77,7 @@ class bit01(enemy):
         else:
             startDir = (random.randrange(-1, 1+1, 2), 0)
         super().__init__(game, pos, health = 2, imgSheet = imgSheet, startDir = startDir)
+        
 
 class turret1(enemy):
     # Okay PLEASE READ THIS WHEN DEALING WITH THIS SPRITE:
