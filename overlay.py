@@ -20,7 +20,7 @@ class pauseOverlay(pygame.sprite.Sprite):
         self.text = []
         self.active = False
         self.rect = pygame.Rect(0, 0, winWidth, winHeight)
-        self.image = pygame.Surface((winWidth, winHeight))
+        self.image = pygame.Surface((winWidth, winHeight), pygame.SRCALPHA)
         self.transparent = (255,182,193)
         self.image.set_colorkey(self.transparent)
         self.loadComponents()
@@ -32,6 +32,8 @@ class pauseOverlay(pygame.sprite.Sprite):
             
         self.audioSlider1 = settingSlider(self.game, (100, 350), addGroups = [self.components])
         self.audioSlider2 = settingSlider(self.game, (100, 500), addGroups = [self.components])
+        self.audioSlider1.image.set_colorkey((0,0,0))
+        self.audioSlider2.image.set_colorkey((0,0,0))
         self.fpsButton = button(self.game, (800, 250), text = 'Toggle FPS', onClick = lambda:self.game.toggleFps() ,addGroups = [self.components], center = True)
         self.aaliasButton = button(self.game, (800, 330), text = 'Toggle Anti - Aliasing', onClick = lambda:self.game.toggleAalias() ,addGroups = [self.components], center = True)
         self.text = [
@@ -63,7 +65,7 @@ class pauseOverlay(pygame.sprite.Sprite):
             self.applyComponents()
     
     def render(self):
-        self.image.fill(colors.black)#self.transparent)
+        self.image.fill((0,0,0,160)) #self.transparent)
         for comp in self.components:
             self.image.blit(comp.image, comp.rect)
             for text in self.text:

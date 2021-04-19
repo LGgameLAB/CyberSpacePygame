@@ -91,6 +91,10 @@ class level:
                 
                 if tile_object.type == 'turret1':
                     turret1(self.game, (tile_object.x, tile_object.y), False)
+                
+                if tile_object.type == 'megaTurret':
+                    megaTurret(self.game, (tile_object.x, tile_object.y), False)
+
             if tile_object.name == 'consumable':
                 if tile_object.type == 'massFireGun':
                     massFireGunConsumable(self.game, (tile_object.x, tile_object.y))

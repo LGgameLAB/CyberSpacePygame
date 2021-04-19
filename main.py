@@ -56,6 +56,7 @@ class game:
         self.clock = pygame.time.Clock()
         self.new()
 
+
     def new(self):
         self.enemies = pygame.sprite.Group()
         self.sprites = pygame.sprite.Group()
@@ -63,7 +64,7 @@ class game:
         self.colliders = pygame.sprite.Group()
         self.dmgRects = pygame.sprite.Group()
         self.pBullets = pygame.sprite.Group()
-        self.eBullets = pygame.sprite.Group()   
+        self.eBullets = pygame.sprite.Group()
         self.items = pygame.sprite.Group()
         self.levels = gameLevels
         self.player = player(self, asset('Space-ManR.png'), 'Cyber Man', imgSheet = 
@@ -73,8 +74,8 @@ class game:
             'l': asset('player/idleL(2).png'), 
             'idleR': asset('player/idleR(2).png'), 
             'idleL': asset('player/idleL(2).png'),
-            'flyR': asset('player/flyR.png'), 
-            'flyL': asset('player/flyL.png')})
+            'flyR': asset('player/flyR(2).png'), 
+            'flyL': asset('player/flyL(2).png')})
             
         self.player.gravity = self.gravity
         self.end = False
@@ -341,7 +342,7 @@ class game:
             #pygame.display.toggle_fullscreen()
 
     def getPause(self):
-        if pygame.time.get_ticks() - self.lastPause >= 120:
+        if pygame.time.get_ticks() - self.lastPause >= 180:
             keys = pygame.key.get_pressed()
             if keys[keySet['pause']]:
                 if self.pause:

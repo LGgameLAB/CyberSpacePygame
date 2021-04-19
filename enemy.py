@@ -162,6 +162,91 @@ class turret1(enemy):
                 
             return returnVal
 
+class megaTurret(enemy):
+    # Okay PLEASE READ THIS WHEN DEALING WITH THIS SPRITE:
+    # The Turret bases its fire direction based on its animation frame
+    # It is important you define both directions in the animation sheet or one side will invert and it will confuse it all up
+    # Pleas be careful when aligning the animation with the firing - Luke Mistake 20201
+    def __init__(self, game, pos, vertical):
+        imgSheet = {'tileWidth': 128, 'r': asset('enemies/megaTurret.png'), 'l': asset('enemies/megaTurret.png')} # Animation Sheet
+        if vertical:
+            startDir = (0, random.randrange(-1, 1+1, 2))
+        else:
+            startDir = (random.randrange(-1, 1+1, 2), 0)
+
+        super().__init__(game, pos, health = 8, imgSheet = imgSheet, startDir = startDir, groups = (game.sprites, game.enemies, game.layer2, game.colliders))
+        self.animations.delay = 90*6
+        self.fireAngle = 90
+        self.fireDelay = 90*4
+        self.lastFire = -self.fireDelay
+        self.animations.framex += random.randint(0,8)*64
+        self.width = 100
+        self.height = 100
+    
+    def update(self): 
+        super().update()
+        self.fireAngle = ((self.animations.framex/self.animations.tileWidth)/8)*360
+        if pygame.time.get_ticks() - self.lastFire >= self.fireDelay:
+            self.fire()
+            self.lastFire = pygame.time.get_ticks()
+        
+        print(self.rect.width)
+    
+    
+    def fire(self):
+        angleVector = pygame.Vector2((1, 0)).rotate(self.fireAngle) 
+        buls = [enemyBullet(self.game, self.rect.center, angleVector, -self.fireAngle),
+                enemyBullet(self.game, self.rect.center, angleVector, -self.fireAngle, offset = 4), 
+                enemyBullet(self.game, self.rect.center, angleVector, -self.fireAngle, offset = -4)]
+        for bul in buls:
+            while bul.rect.colliderect(self.rect):
+                bul.move()
+
+    
+    def move(self):
+        self.player = self.game.player
+        testVec = pygame.Vector2((self.pos.x, self.pos.y))
+        if self.collideCheck(pygame.Vector2(testVec.x+(self.dir.x*self.vel), testVec.y)):
+            
+            if self.dir.x > 0:
+                self.dir = self.dir.reflect((-1,0))
+            else:
+                self.dir = self.dir.reflect((1,0))
+        
+        self.pos.x += self.dir.x*self.vel
+        # If we hit player move the player
+        testRect = pygame.Rect(self.pos.x, self.pos.y, self.rect.width, self.rect.height)
+        if testRect.colliderect(self.player.rect):
+            if self.dir.x < 0:
+                self.player.rect.right = testRect.left
+            else:
+                self.player.rect.left = testRect.right
+
+        if self.collideCheck(pygame.Vector2(testVec.x, testVec.y+(self.dir.y*self.vel))):
+            if self.dir.y > 0:
+                self.dir = self.dir.reflect((0, -1))
+            else:
+                self.dir = self.dir.reflect((0, 1))
+        
+        self.pos.y += self.dir.y*self.vel
+        testRect = pygame.Rect(self.pos.x, self.pos.y, self.rect.width, self.rect.height)
+        if testRect.colliderect(self.player.rect):
+            if self.dir.y < 0:
+                self.player.rect.bottom = self.rect.top
+            else:
+                self.player.rect.top = self.rect.bottom
+
+    def collideCheck(self, vector):
+            returnVal = False
+        
+            testRect = pygame.Rect(round(vector.x), round(vector.y), self.rect.width, self.rect.height)
+            for obj in self.game.colliders:
+                if not obj == self:
+                    if testRect.colliderect(obj.rect):
+                        returnVal = True
+                
+            return returnVal
+
 
 class bit02(enemy):
 
