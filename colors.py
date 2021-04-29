@@ -49,3 +49,6 @@ def light(color, *args):
             returnCol.append(val*2)
 
     return tuple(returnCol)
+
+def rgba(rgb, alpha):
+    return tuple([rgb[0], rgb[1], rgb[2], max(min(255, alpha), 0)])

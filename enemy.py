@@ -4,6 +4,7 @@ import random
 from stgs import *
 from animations import *
 from player import *
+from objects import *
 
 class enemy(pygame.sprite.Sprite):
     pos = pygame.Vector2((0, 0))
@@ -27,10 +28,9 @@ class enemy(pygame.sprite.Sprite):
         self.loadAnimations()
         self.width = self.imgSheet['tileWidth']
         self.height = self.imgSheet['tileWidth']
-        self.rect = pygame.Rect(self.pos.x, self.pos.y, self.imgSheet['tileWidth'], self.imgSheet['tileWidth'])
         
-
         self.pos = pygame.Vector2((startPos[0], startPos[1]))
+        self.rect = pygame.Rect(self.pos.x, self.pos.y, self.imgSheet['tileWidth'], self.imgSheet['tileWidth'])
         self.dir = pygame.Vector2(self.startDir)
         
     
@@ -77,13 +77,25 @@ class bit01(enemy):
         else:
             startDir = (random.randrange(-1, 1+1, 2), 0)
         super().__init__(game, pos, health = 2, imgSheet = imgSheet, startDir = startDir)
+    
+    def collideCheck(self, vector):
+        returnVal = False
+    
+        testRect = pygame.Rect(round(vector.x), round(vector.y), self.rect.width, self.rect.height)
+        for obj in self.game.colliders:
+            if not isinstance(obj, (turret1, mPlatform)):
+                if testRect.colliderect(obj.rect):
+                    returnVal = True
+        
+        return returnVal
+
         
 
 class turret1(enemy):
     # Okay PLEASE READ THIS WHEN DEALING WITH THIS SPRITE:
     # The Turret bases its fire direction based on its animation frame
     # It is important you define both directions in the animation sheet or one side will invert and it will confuse it all up
-    # Pleas be careful when aligning the animation with the firing - Luke Mistake 20201
+    # Pleas be careful when aligning the animation with the firing - Luke Mistake 2021
     def __init__(self, game, pos, vertical):
         imgSheet = {'tileWidth': 64, 'r': asset('enemies/Turret1.png'), 'l': asset('enemies/Turret1.png')} # Animation Sheet
         if vertical:
@@ -159,7 +171,9 @@ class turret1(enemy):
                 if not obj == self:
                     if testRect.colliderect(obj.rect):
                         returnVal = True
-                
+            for obj in self.game.level.platWalls:
+                if testRect.colliderect(obj.rect):
+                    returnVal = True
             return returnVal
 
 class megaTurret(enemy):
@@ -169,10 +183,7 @@ class megaTurret(enemy):
     # Pleas be careful when aligning the animation with the firing - Luke Mistake 20201
     def __init__(self, game, pos, vertical):
         imgSheet = {'tileWidth': 128, 'r': asset('enemies/megaTurret.png'), 'l': asset('enemies/megaTurret.png')} # Animation Sheet
-        if vertical:
-            startDir = (0, random.randrange(-1, 1+1, 2))
-        else:
-            startDir = (random.randrange(-1, 1+1, 2), 0)
+        startDir = pygame.Vector2(1, 0).rotate(45)
 
         super().__init__(game, pos, health = 8, imgSheet = imgSheet, startDir = startDir, groups = (game.sprites, game.enemies, game.layer2, game.colliders))
         self.animations.delay = 90*6
@@ -190,7 +201,6 @@ class megaTurret(enemy):
             self.fire()
             self.lastFire = pygame.time.get_ticks()
         
-        print(self.rect.width)
     
     
     def fire(self):
@@ -274,6 +284,17 @@ class bit02(enemy):
                 self.dir = self.dir.reflect((0, 1))
         
         self.pos.y += self.dir.y*self.vel
+    
+    def collideCheck(self, vector):
+        returnVal = False
+    
+        testRect = pygame.Rect(round(vector.x), round(vector.y), self.rect.width, self.rect.height)
+        for obj in self.game.colliders:
+            if not isinstance(obj, (turret1, mPlatform)):
+                if testRect.colliderect(obj.rect):
+                    returnVal = True
+        
+        return returnVal
 
 class bossyBit(enemy):
     def __init__(self, game, pos):

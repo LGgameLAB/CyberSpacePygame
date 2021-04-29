@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.4" tiledversion="1.4.1" orientation="orthogonal" renderorder="right-down" width="150" height="25" tilewidth="32" tileheight="32" infinite="0" nextlayerid="5" nextobjectid="71">
+<map version="1.4" tiledversion="1.4.1" orientation="orthogonal" renderorder="right-down" width="150" height="25" tilewidth="32" tileheight="32" infinite="0" nextlayerid="5" nextobjectid="73">
  <tileset firstgid="1" source="../cyber_space_tileset1.tsx"/>
  <tileset firstgid="5" source="../cyber_space_tileset2.tsx"/>
  <layer id="1" name="Tile Layer 1" width="150" height="25">
@@ -23,7 +23,13 @@
   <object id="9" name="dmgRect" x="32" y="64" width="16" height="672"/>
   <object id="16" name="wall" x="168" y="616" width="16" height="16"/>
   <object id="17" name="dmgRect" x="160" y="608" width="32" height="32"/>
-  <object id="19" name="mPlatform" x="192" y="384" width="160" height="32"/>
+  <object id="19" name="mPlatform" x="192" y="384" width="160" height="32">
+   <properties>
+    <property name="pause" type="bool" value="false"/>
+    <property name="speed" type="int" value="6"/>
+    <property name="vertical" type="bool" value="false"/>
+   </properties>
+  </object>
   <object id="30" name="wall" x="264" y="584" width="16" height="16"/>
   <object id="31" name="dmgRect" x="256" y="576" width="32" height="32"/>
   <object id="32" name="wall" x="648" y="616" width="16" height="16"/>
@@ -34,7 +40,7 @@
   <object id="37" name="dmgRect" x="800" y="544" width="32" height="32"/>
   <object id="38" name="wall" x="936" y="616" width="16" height="16"/>
   <object id="39" name="dmgRect" x="928" y="608" width="32" height="32"/>
-  <object id="42" name="key" x="664" y="248">
+  <object id="42" name="key" x="544" y="256">
    <point/>
   </object>
   <object id="43" name="door" x="4608" y="320" width="96" height="128"/>
@@ -51,7 +57,6 @@
    </properties>
    <point/>
   </object>
-  <object id="49" x="768" y="-160"/>
   <object id="50" name="wall" x="2400" y="128" width="32" height="32"/>
   <object id="51" name="wall" x="2400" y="640" width="32" height="32"/>
   <object id="52" name="enemy" type="turret1" x="2336" y="640">
@@ -72,7 +77,7 @@
    </properties>
    <point/>
   </object>
-  <object id="55" name="enemy" type="turret1" x="64" y="672">
+  <object id="55" name="enemy" type="turret1" x="64" y="640">
    <properties>
     <property name="vertical" type="bool" value="false"/>
    </properties>

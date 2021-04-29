@@ -42,6 +42,7 @@ class player(pygame.sprite.Sprite):
         
         self.loadAnimations()
         self.hpBar = healthBar2(self.game, self)
+        self.coinMeter = coinMeter(self.game, self)
 
     def loadAnimations(self):
         self.animations = animation(self)
@@ -127,6 +128,7 @@ class player(pygame.sprite.Sprite):
                 returnVal = obj.rect
                 if isinstance(obj, mPlatform):
                     self.dir.x += (obj.dir.x * obj.vel)/self.vel
+                    if self.dir.y > 0 and obj.dir.y > 0:
+                        self.rect.bottom = obj.rect.top
             
         return returnVal
-

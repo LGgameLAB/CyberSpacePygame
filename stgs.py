@@ -28,7 +28,7 @@ def asset(assetName):
     return os.path.join(ASSETSPATH, assetName)
 
 #### Establishes window size ####
-winWidth, winHeight = 1200, 700
+winWidth, winHeight = 1280, 720
 
 #### Anti-Aliasing on text ####
 aalias = True
@@ -111,4 +111,5 @@ def saveData(file, game):
     }
     with open(file, 'wb') as f:
         pickle.dump(saveDict, f)
+
     

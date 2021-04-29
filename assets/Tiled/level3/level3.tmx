@@ -276,12 +276,6 @@
    </properties>
    <point/>
   </object>
-  <object id="151" name="enemy" type="bit01" x="640" y="480">
-   <properties>
-    <property name="vertical" type="bool" value="false"/>
-   </properties>
-   <point/>
-  </object>
   <object id="152" name="enemy" type="bit01" x="352" y="544">
    <properties>
     <property name="vertical" type="bool" value="false"/>

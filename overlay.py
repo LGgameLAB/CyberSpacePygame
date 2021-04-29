@@ -12,6 +12,11 @@ class text:
     def __str__(self):
         return self.rend
 
+def transparentRect(size, alpha, color=(0, 0, 0)):
+    surf = pygame.Surface(size, pygame.SRCALPHA)
+    surf.fill((color[0], color[1], color[2], alpha))
+    return surf 
+
 class pauseOverlay(pygame.sprite.Sprite):
     def __init__(self, game):
         self.game = game

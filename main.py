@@ -11,12 +11,14 @@ from enemy import *
 from fx import *
 from levels import *
 from objects import *
+from overlay import *
 from player import *
 from sfx import *
 from stgs import *
-from overlay import *
+
 loadSave(saveFile)
 from stgs import *
+
 
 #### Game object ####
 class game:
@@ -202,6 +204,7 @@ class game:
             fpsText = fonts['6'].render(str(self.currentFps), self.antialiasing, (255, 255, 255))
             self.win.blit(fpsText, (1100, 5))
         
+        self.win.blit(transparentRect((125, 35), 100), (90, 22))
         visPoints = fonts['6'].render("Score: " + str(self.points), self.antialiasing, (255, 255, 255))
         self.win.blit(visPoints, (100, 20))
 
@@ -219,7 +222,6 @@ class game:
         
         hits = pygame.sprite.spritecollide(self.player, self.dmgRects, False)
         for hit in hits:
-            
             self.player.takeDamage(hit.damage)
 
         hits = pygame.sprite.spritecollide(self.player, self.eBullets, False)
@@ -233,6 +235,7 @@ class game:
         for item in items:
             if isinstance(item, coin):
                 self.points += item.value
+                self.player.coinMeter.addCoin()
             elif isinstance(item, gunConsumable):
                 self.player.gun.kill()
                 
@@ -297,7 +300,7 @@ class game:
         pygame.quit()
         sys.exit()
 
-    def runEvents(self):
+    def runEvents(self):    
         ## Catch all events here
         self.events = pygame.event.get()
         for event in self.events:
@@ -354,6 +357,15 @@ class game:
 
                 self.lastPause = pygame.time.get_ticks()
 
+    def getSprBylID(self, lID):
+        for sprite in self.sprites:
+            try:
+                if sprite.lID == lID:
+                    return sprite
+            except:
+                pass
+        return False
+
     #### First menu loop ####
     def menuLoop(self):
         run = True
@@ -399,7 +411,7 @@ class game:
                 break
             
             pygame.display.update()
-        
+
 
     def victoryLoop(self):
         menuButton = button(self, (winWidth/2, winHeight/2), text="Back to Menu", center = True, colors = (colors.yellow, colors.white))

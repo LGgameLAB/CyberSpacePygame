@@ -15,6 +15,8 @@ class level:
 
     def __init__(self, **kwargs):
         self.objects = pygame.sprite.Group() 
+        self.triggers = pygame.sprite.Group()
+        self.platWalls = pygame.sprite.Group()
         for k, v in kwargs.items():
             self.__dict__[k] = v
 
@@ -71,7 +73,10 @@ class level:
                 self.objects.add(self.entrance)
 
             if tile_object.name == 'wall':
-                collider(self.game, (int(tile_object.x), int(tile_object.y), int(tile_object.width), int(tile_object.height)))
+                if tile_object.type == 'platform':
+                    self.platWalls.add(platWall(self.game, (int(tile_object.x), int(tile_object.y), int(tile_object.width), int(tile_object.height))))
+                else:
+                    collider(self.game, (int(tile_object.x), int(tile_object.y), int(tile_object.width), int(tile_object.height)))
 
             if tile_object.name == 'enemy':
                 if tile_object.type == 'bit01':
@@ -90,7 +95,10 @@ class level:
                     bossyBit(self.game, (tile_object.x, tile_object.y))
                 
                 if tile_object.type == 'turret1':
-                    turret1(self.game, (tile_object.x, tile_object.y), False)
+                    try:
+                        turret1(self.game, (tile_object.x, tile_object.y), tile_object.vertical)
+                    except:
+                        turret1(self.game, (tile_object.x, tile_object.y), False)
                 
                 if tile_object.type == 'megaTurret':
                     megaTurret(self.game, (tile_object.x, tile_object.y), False)
@@ -122,7 +130,17 @@ class level:
                 dmgRect(self.game, (tile_object.x, tile_object.y, tile_object.width, tile_object.height))
             
             if tile_object.name == 'mPlatform':
-                mPlatform(self.game, (tile_object.x, tile_object.y, tile_object.width, tile_object.height))
+                try:
+                    self.objects.add(mPlatform(self.game, (tile_object.x, tile_object.y, tile_object.width, tile_object.height), lID = tile_object.id, vertical = tile_object.vertical, pause=tile_object.pause, vel=tile_object.speed))
+                except:
+                    self.objects.add(mPlatform(self.game, (tile_object.x, tile_object.y, tile_object.width, tile_object.height)))
+
+            if tile_object.name == 'trigger':
+                print(tile_object.target)
+                if tile_object.type == 'initPlat':
+                    self.triggers.add(trigger(self.game, (tile_object.x, tile_object.y, tile_object.width, tile_object.height), activatePlatform, (self.game, tile_object.target)))
+            
+
 ## Handles loading a level from a Cyberspace website link
 import requests
 from zipfile import ZipFile
@@ -216,5 +234,14 @@ level4 = level(
     rendType = 1,
     mapDir = asset('Tiled/level4/level4.tmx')
 )
+level5 = level(
+    rendType = 1,
+    mapDir = asset('Tiled/level5/level5.tmx')
+)
+level6 = level(
+    rendType = 1,
+    mapDir = asset('Tiled/level6/level6.tmx')
+)
 ### All Game levels
-gameLevels = [level1, level2, level3, level4,]
+#gameLevels = [level6, level5, level1, level2, level3, level4,]
+gameLevels = [level1, level2, level3, level4,level5, level6, ]
