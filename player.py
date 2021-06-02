@@ -41,11 +41,11 @@ class player(pygame.sprite.Sprite):
             self.__dict__[k] = v
         
         self.loadAnimations()
-        self.hpBar = healthBar2(self.game, self)
+        self.hpBar = healthBar(self.game, self)
         self.coinMeter = coinMeter(self.game, self)
 
     def loadAnimations(self):
-        self.animations = animation(self)
+        self.animations = animation(self)   
 
     #### Updates player ####
     def update(self):
@@ -57,6 +57,7 @@ class player(pygame.sprite.Sprite):
         if pygame.time.get_ticks() - self.lastHit >= self.hitCooldown:
             self.health -= damage
             self.lastHit = pygame.time.get_ticks()
+            self.game.mixer.playFx('pHit')
     #### Move Physics ####
     def move(self):
         self.dir = pygame.math.Vector2((0, 0))

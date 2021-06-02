@@ -270,7 +270,6 @@ class button(pygame.sprite.Sprite):
             self.textRect.y += 2
 
     def update(self):
-        
         self.image = pygame.Surface(self.rect.size)
         self.hover = False
         self.clicked = False
@@ -290,6 +289,9 @@ class button(pygame.sprite.Sprite):
             self.image.fill(self.colors[0])
         
         self.image.blit(self.rendText, self.textRect)
+    
+    def reset(self):
+        self.clicked = False
 
 class settingSlider(pygame.sprite.Sprite):
     
@@ -440,10 +442,10 @@ class gun(pygame.sprite.Sprite):
             self.setAngle(False)
             self.fire(mPos) ## Inputs values. Notice how I used rect.center instead of pPos.
             self.lastFire = pygame.time.get_ticks()
-            self.game.mixer.playFx('gunFx1')
-    
+            
     def fire(self, mPos):
         bullet(self.game, self.rect.center, mPos, self.angle)
+        self.game.mixer.playFx('gunFx1')
 
     def setAngle(self, *args):
         if len(args) > 0:
@@ -490,6 +492,7 @@ class massFireGun(gun):
         bullet(self.game, self.rect.center, mPos, self.angle, offset = -2.5)
         bullet(self.game, self.rect.center, mPos, self.angle, offset = -5)
         bullet(self.game, self.rect.center, mPos, self.angle, offset = -90)
+        self.game.mixer.playFx('gunFx1')
 
 class tripleGun(gun):
 
@@ -500,14 +503,31 @@ class tripleGun(gun):
         bullet(self.game, self.rect.center, mPos, self.angle, offset = 5)
         bullet(self.game, self.rect.center, mPos, self.angle)
         bullet(self.game, self.rect.center, mPos, self.angle, offset = -5)
+        self.game.mixer.playFx('gunFx1')
 
 class lazerGun(gun):
+    def __init__(self, game, player):
+        super().__init__(game, asset('objects/lazgun.png'), player, damage = 1)
 
+    def fire(self, mPos):
+        lazer2(self.game, self.rect.center, mPos, self.angle)
+        self.game.mixer.playFx('gunFx2')
+
+class megaLazerGun(gun):
     def __init__(self, game, player):
         super().__init__(game, asset('objects/gun.png'), player, damage = 1)
 
     def fire(self, mPos):
-        lazer(self.game, self.rect.center, mPos, self.angle)
+        lazer2(self.game, self.rect.center, mPos, self.angle)
+        bullet(self.game, self.rect.center, mPos, self.angle, offset = 180)
+        bullet(self.game, self.rect.center, mPos, self.angle, offset = 90)
+        bullet(self.game, self.rect.center, mPos, self.angle, offset = 15)
+        bullet(self.game, self.rect.center, mPos, self.angle, offset = 7.5)
+        bullet(self.game, self.rect.center, mPos, self.angle, offset = -7.5)
+        bullet(self.game, self.rect.center, mPos, self.angle, offset = -15)
+        bullet(self.game, self.rect.center, mPos, self.angle, offset = -90)
+        self.game.mixer.playFx('gunFx1')
+        self.game.mixer.playFx('gunFx2')
 
 class standardGun(gun):
     def __init__(self, game, player):
@@ -542,12 +562,12 @@ class bullet(pygame.sprite.Sprite):
 
 class healthBar(pygame.sprite.Sprite):
     x = winWidth/3
-    y = 3
+    y = 10
     width = 100
-    height = 30
-    bgColor = colors.light(colors.black, 50)
+    height = 40
+    bgColor = colors.light(colors.black, 80)
     hpColor = colors.lightGreen
-    offset = 10
+    offset = 8
     gap = offset
     def __init__(self, game, player, **kwargs):
         self.groups = game.sprites, game.overlayer
@@ -557,14 +577,17 @@ class healthBar(pygame.sprite.Sprite):
             self.__dict__[k] = v
 
         self.player = player
-        self.image = pygame.Surface((self.width, self.height))
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
-        self.barRect = pygame.Rect(self.offset/2, self.offset/2, self.width-self.gap, self.height-self.gap)
+        self.barRect = pygame.Rect(self.offset/2, self.offset/2, self.rect.width-self.gap, self.rect.height-self.gap)
+        self.image = pygame.Surface((self.rect.width, self.rect.height))
     
     def update(self):
+        self.rect.width = 2*self.player.maxHp
+        self.barRect = pygame.Rect(self.offset/2, self.offset/2, self.rect.width-self.gap, self.rect.height-self.gap)
+        self.image = pygame.Surface((self.rect.width, self.rect.height))
         self.image.fill((self.bgColor))
         self.renderBar()
-    
+
     def renderBar(self):
         pygame.draw.rect(self.image, self.hpColor, (self.barRect.x, self.barRect.y, (self.barRect.width)*(self.player.health/self.player.maxHp), self.barRect.height))
     # def renderBar(self):
@@ -581,6 +604,14 @@ class healthBar2(healthBar):
 
     def __init__(self, game, player):
         super().__init__(game, player)
+    
+    def update(self):
+        self.rect.height = 2*self.player.maxHp
+        self.barRect = pygame.Rect(self.offset/2, self.offset/2, self.rect.width-self.gap, self.rect.height-self.gap)
+        self.image = pygame.Surface((self.rect.width, self.rect.height))
+        self.image.fill((self.bgColor))
+        self.renderBar()
+
     def renderBar(self):
         pygame.draw.rect(self.image, self.hpColor, (self.barRect.x, self.barRect.y+(self.barRect.height)*(1 - self.player.health/self.player.maxHp), self.barRect.width, (self.barRect.height)*(self.player.health/self.player.maxHp)))
 
@@ -593,13 +624,14 @@ class coinMeter(consumable):
         ## Setup
         self.x = 0
         self.y = 40
-        self.width = 30
-        self.height = 100
-        self.bgColor = colors.rgba(colors.light(colors.black, 20), 120)
+        self.width = 50
+        self.height = 120
+        self.bgColor = colors.rgba(colors.light(colors.black, 20), 190)
         self.coinColor = colors.yellow
         self.offset = 5
         self.gap = self.offset*2
         
+        self.meterImage = pygame.image.load(asset('objects/coinMeter.png'))
         self.meterLevel = 0
         self.coins = 0
         self.coinsPerLevel = 5
@@ -610,7 +642,7 @@ class coinMeter(consumable):
         self.player = player
         self.image = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
-        self.barRect = pygame.Rect(self.offset, self.offset, self.width-self.gap, self.height-self.gap)
+        self.barRect = pygame.Rect(self.offset, 7, self.width-self.gap, self.height-self.gap)
         
     
     def update(self):
@@ -619,14 +651,17 @@ class coinMeter(consumable):
     
     def renderBar(self):
         pygame.draw.rect(self.image, self.coinColor, (self.barRect.x, self.barRect.y+(self.barRect.height)*(1 - self.meterLevel/self.coinsPerLevel), self.barRect.width, (self.barRect.height)*(self.meterLevel/self.coinsPerLevel)))
+        self.image.blit(self.meterImage, (0, 0))
 
     def addCoin(self):
         self.coins += 1
         self.meterLevel += 1
         if self.meterLevel >= self.coinsPerLevel:
             self.meterLevel = 0
+            self.player.maxHp = round(self.player.maxHp*1.04)
             self.player.health += self.player.maxHp*self.healthAddPerc
             self.player.health = min(self.player.maxHp, self.player.health)
+        print(self.player.maxHp)
 
 class lazer(bullet):
     def __init__(self, game, pos, target, angle):
@@ -671,6 +706,68 @@ class lazer(bullet):
                 l.kill()
             self.kill()
    
+class lazer2(pygame.sprite.Sprite):
+    def __init__(self, game, pos, target, angle, **kwargs):
+        self.groups = game.sprites, game.layer2,#  game.pBullets
+        self.game = game
+        pygame.sprite.Sprite.__init__(self, self.groups)
+
+        for k, v in kwargs.items():
+            self.__dict__[k] = v
+
+        self.pos = pygame.Vector2(pos)
+        self.dir = pygame.Vector2(target).normalize()
+        #self.dir = self.dir.rotate(self.offset)
+        self.angle = angle
+        self.image = pygame.Surface((800, 20), pygame.SRCALPHA)
+        self.rect = pygame.Rect(0, 0, self.image.get_width(), self.image.get_height())
+        self.beamLen = 800
+        self.rect.topleft = self.pos
+        self.initT = pygame.time.get_ticks()
+        self.duration = 240
+        self.render()
+    
+    def render(self):
+        acc = 10 # The smaller the accuracy, the more precise the collision detection
+        start = pygame.Vector2(self.pos)
+        dist = 0
+        for x in range(0, self.rect.width, acc):
+            start += self.dir*acc
+            rect = pygame.Rect(start.x, start.y, 30, 30)
+            dist += acc
+            self.checkSprCol(rect)
+            if self.checkCol(rect):
+                break
+
+        pygame.draw.line(self.image, (0, 0, 128), (0, self.rect.height/2), (dist, self.rect.height/2), 5)
+        self.rotImg()
+
+
+    def update(self):
+        if pygame.time.get_ticks() - self.initT >= self.duration:
+            self.kill()
+
+    def checkCol(self, rect):
+        for obj in self.game.colliders:
+            if rect.colliderect(obj.rect):
+                return True
+        return False
+    
+    def checkSprCol(self, rect):
+        for obj in self.game.enemies:
+            if rect.colliderect(obj.rect):
+                obj.health -= self.game.player.gun.damage
+                if obj.health <= 0:
+                    self.game.points += obj.points
+    
+    def rotImg(self):
+        self.image = pygame.transform.rotate(self.image, self.angle)
+        self.rect = self.image.get_rect(center = self.image.get_rect(center = self.rect.center).center)
+        vec1 = pygame.Vector2(1, 0)
+        vec1 = vec1.rotate(-self.angle)*(self.beamLen/2)
+        self.rect.topleft += vec1
+        self.rect.x -= self.beamLen/2
+    
 class tp1(teleporter):
     def __init__(self, game, pos, target):
         super().__init__(game, asset('objects/teleporter1.png'), pos, target)
@@ -690,6 +787,12 @@ class tripleGunConsumable(gunConsumable):
     def __init__(self, game, pos):  
         gun = tripleGun
         image = pygame.image.load(asset('objects/gun.png'))
+        super().__init__(game, pos, gun, image = image)
+
+class lazerGunConsumable(gunConsumable):
+    def __init__(self, game, pos):  
+        gun = lazerGun
+        image = pygame.image.load(asset('objects/lazgun.png'))
         super().__init__(game, pos, gun, image = image)
 
 class hpPack1(consumable):

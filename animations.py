@@ -14,6 +14,7 @@ class animation:
         self.cycle = False
         self.dir = 'idleR'
         self.lastTick = pygame.time.get_ticks()
+        self.frameReset = True
 
     def loadSheet(self):
         self.imgSheet = self.sprite.imgSheet
@@ -59,16 +60,15 @@ class animation:
         try:
             if self.sprite.imgSheet['active']:
                 self.sprite.image = self.imgSheet[self.dir].get_image(self.framex, 0, self.tileWidth, self.tileHeight)
-                self.sprite.image.set_colorkey((0,0,0))
+                #self.sprite.image.set_colorkey((0,0,0))
                 self.imageFx()
         except:
             self.sprite.image = self.imgSheet[self.dir].get_image(self.framex, 0, self.tileWidth, self.tileHeight)
-            self.sprite.image.set_colorkey((0,0,0))
+            #self.sprite.image.set_colorkey((0,0,0))
             
 
     def getStrDir(self):
         ### Get the last specific direction
-        
         lastDir = ''
         fullLastDir = self.dir
         if len(self.dir) == 1:
@@ -105,7 +105,7 @@ class animation:
             else:
                 self.dir = lastDir.lower()
         
-        if not self.dir == fullLastDir:
+        if self.frameReset and not self.dir == fullLastDir:
             self.framex = 0
     
     def imageFx(self):

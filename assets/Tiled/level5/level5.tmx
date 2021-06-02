@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.4" tiledversion="1.4.1" orientation="orthogonal" renderorder="right-down" width="44" height="80" tilewidth="32" tileheight="32" infinite="0" nextlayerid="4" nextobjectid="101">
+<map version="1.4" tiledversion="1.4.1" orientation="orthogonal" renderorder="right-down" width="44" height="80" tilewidth="32" tileheight="32" infinite="0" nextlayerid="4" nextobjectid="122">
  <tileset firstgid="1" source="../cyber_space_tileset1.tsx"/>
  <tileset firstgid="5" source="../cyber_space_tileset2.tsx"/>
  <layer id="1" name="Tile Layer 1" width="44" height="80">
@@ -108,7 +108,7 @@
   <object id="52" name="dmgRect" x="704" y="2240" width="256" height="32"/>
   <object id="53" name="wall" x="1128" y="2248" width="240" height="16"/>
   <object id="54" name="dmgRect" x="1120" y="2240" width="256" height="32"/>
-  <object id="55" name="trigger" type="initPlat" x="960" y="2240" width="160" height="136">
+  <object id="55" name="trigger" type="initPlat" x="960" y="2240" width="160" height="104">
    <properties>
     <property name="target" type="object" value="56"/>
    </properties>
@@ -217,5 +217,17 @@
   <object id="100" name="enemy" type="bit01" x="120" y="544">
    <point/>
   </object>
+  <object id="107" name="consumable" type="coinBit" x="96" y="2464" width="32" height="32"/>
+  <object id="108" name="consumable" type="coinBit" x="160" y="2464" width="32" height="32"/>
+  <object id="109" name="consumable" type="coinBit" x="224" y="2464" width="32" height="32"/>
+  <object id="113" name="consumable" type="coinBit" x="448" y="2464" width="32" height="32"/>
+  <object id="114" name="consumable" type="coinBit" x="512" y="2464" width="32" height="32"/>
+  <object id="115" name="consumable" type="coinBit" x="576" y="2464" width="32" height="32"/>
+  <object id="116" name="consumable" type="coinBit" x="736" y="2184" width="32" height="32"/>
+  <object id="117" name="consumable" type="coinBit" x="800" y="2184" width="32" height="32"/>
+  <object id="118" name="consumable" type="coinBit" x="864" y="2184" width="32" height="32"/>
+  <object id="119" name="consumable" type="coinBit" x="1184" y="2184" width="32" height="32"/>
+  <object id="120" name="consumable" type="coinBit" x="1248" y="2184" width="32" height="32"/>
+  <object id="121" name="consumable" type="coinBit" x="1312" y="2184" width="32" height="32"/>
  </objectgroup>
 </map>

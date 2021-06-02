@@ -108,6 +108,8 @@ class level:
                     massFireGunConsumable(self.game, (tile_object.x, tile_object.y))
                 if tile_object.type == 'tripleGun':  
                     tripleGunConsumable(self.game, (tile_object.x, tile_object.y))
+                if tile_object.type == 'lazerGun':  
+                    lazerGunConsumable(self.game, (tile_object.x, tile_object.y))
                 elif tile_object.type == 'hpPack1':
                     hpPack1(self.game, (tile_object.x, tile_object.y))
                 elif tile_object.type == 'coinBit':
@@ -136,7 +138,6 @@ class level:
                     self.objects.add(mPlatform(self.game, (tile_object.x, tile_object.y, tile_object.width, tile_object.height)))
 
             if tile_object.name == 'trigger':
-                print(tile_object.target)
                 if tile_object.type == 'initPlat':
                     self.triggers.add(trigger(self.game, (tile_object.x, tile_object.y, tile_object.width, tile_object.height), activatePlatform, (self.game, tile_object.target)))
             

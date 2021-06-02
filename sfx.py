@@ -6,7 +6,9 @@ pygame.mixer.pre_init(44100, -16, 2, 2048)
 
 ## Provide name: file and volume offset (will not exceed one or drop below zero)
 fx = {
-    'gunFx1': [asset('sounds/flaunch.wav'), 0]
+    'gunFx1': [asset('sounds/flaunch.wav'), 0],
+    'gunFx2': [asset('sounds/Laser_07.mp3'), -0.1],
+    'pHit': [asset('sounds/Hit_02.mp3'), 0.2]
 }
 
 class gameMixer:
@@ -44,7 +46,7 @@ class gameMixer:
             if self.fx[key][1] > 0:
                 sound.set_volume(min(self.fxVolume + self.fx[key][1], 1))
             else:
-                sound.set_volume(max(self.fxVolume + self.fx[key][1], 0))
+                sound.set_volume(max(self.fxVolume + self.fx[key][1], 0.01))
             sound.play()
         except KeyError:
             print("Sound not registered. Maybe you meant playFxFile(*file)")

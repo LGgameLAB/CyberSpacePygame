@@ -1,2 +1,5 @@
 __pycache__
 tests
+build
+dist
+main.spec

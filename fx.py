@@ -5,7 +5,6 @@ from animations import animation
 #  Duration should be handled by the fx object.
 #  Fx initiation into the fx layer will record its instance
 #  
-pygame.Rect
 class fadeOut(pygame.sprite.Sprite):
     alpha = 0
     speed = 4 

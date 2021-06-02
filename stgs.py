@@ -1,5 +1,6 @@
 import os
 import pygame
+from pygame.constants import SRCALPHA
 import colors
 import math
 
@@ -42,10 +43,13 @@ platformer = False
 def checkKey(move):
     returnVal = False
     keys = pygame.key.get_pressed()
-    for k in move:
-        if keys[k]:
+    try:
+        for k in move:
+            if keys[k]:
+                returnVal = True
+    except TypeError:
+        if keys[move]:
             returnVal = True
-        
     return returnVal
 
 #### Method works well however you have to set the black color (0,0,0) as the transparent color key in order to make the surface see through
@@ -65,7 +69,8 @@ class Spritesheet:
 
     def get_image(self, x, y, width, height):
         # grab an image out of a larger spritesheet
-        img = pygame.Surface((width, height))
+        img = pygame.Surface((width, height), pygame.SRCALPHA)
+        img.fill((0, 0, 0, 0))
         img.blit(self.image, (0, 0), (x, y, width, height))
         img = pygame.transform.scale(img, (width, height))
         return img
@@ -103,7 +108,7 @@ def loadSave(file):
         print("No Save File")
 
 def saveData(file, game):
-    saveDict = {    # Each value must corresponde to a global variable in this file
+    saveDict = {    # Each value must correspond to a global variable in this file
         'musicVolume': game.mixer.musicVolume,
         'fxVolume': game.mixer.fxVolume,
         'aalias': game.antialiasing,
@@ -111,5 +116,3 @@ def saveData(file, game):
     }
     with open(file, 'wb') as f:
         pickle.dump(saveDict, f)
-
-    

@@ -73,6 +73,6 @@ class pauseOverlay(pygame.sprite.Sprite):
         self.image.fill((0,0,0,160)) #self.transparent)
         for comp in self.components:
             self.image.blit(comp.image, comp.rect)
-            for text in self.text:
-                self.image.blit(text.rend, text.pos)
+        for text in self.text:
+            self.image.blit(text.rend, text.pos)
         

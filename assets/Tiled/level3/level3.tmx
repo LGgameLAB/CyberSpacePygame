@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.4" tiledversion="1.4.1" orientation="orthogonal" renderorder="right-down" width="100" height="56" tilewidth="32" tileheight="32" infinite="0" nextlayerid="4" nextobjectid="158">
+<map version="1.4" tiledversion="1.4.1" orientation="orthogonal" renderorder="right-down" width="100" height="56" tilewidth="32" tileheight="32" infinite="0" nextlayerid="4" nextobjectid="220">
  <tileset firstgid="1" source="../cyber_space_tileset1.tsx"/>
  <tileset firstgid="5" source="../cyber_space_tileset2.tsx"/>
  <layer id="1" name="Tile Layer 1" width="100" height="56">
@@ -136,12 +136,6 @@
    <point/>
   </object>
   <object id="72" name="enemy" type="bit01" x="792" y="512">
-   <properties>
-    <property name="vertical" type="bool" value="false"/>
-   </properties>
-   <point/>
-  </object>
-  <object id="73" name="enemy" type="bit01" x="760" y="760">
    <properties>
     <property name="vertical" type="bool" value="false"/>
    </properties>
@@ -312,5 +306,97 @@
    </properties>
    <point/>
   </object>
+  <object id="159" name="consumable" type="coinBit" x="1184" y="1280" width="32" height="32"/>
+  <object id="160" name="consumable" type="coinBit" x="1184" y="1344" width="32" height="32"/>
+  <object id="161" name="consumable" type="coinBit" x="1184" y="1408" width="32" height="32"/>
+  <object id="162" name="consumable" type="coinBit" x="1184" y="1472" width="32" height="32"/>
+  <object id="163" name="consumable" type="coinBit" x="1184" y="1536" width="32" height="32"/>
+  <object id="166" name="consumable" type="coinBit" x="480" y="272" width="32" height="32"/>
+  <object id="167" name="consumable" type="coinBit" x="544" y="272" width="32" height="32"/>
+  <object id="172" name="consumable" type="coinBit" x="96" y="272" width="32" height="32"/>
+  <object id="173" name="consumable" type="coinBit" x="144" y="272" width="32" height="32"/>
+  <object id="174" name="consumable" type="coinBit" x="192" y="272" width="32" height="32"/>
+  <object id="177" name="enemy" type="bit01" x="416" y="256">
+   <properties>
+    <property name="vertical" type="bool" value="false"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="178" name="enemy" type="bit01" x="32" y="256">
+   <properties>
+    <property name="vertical" type="bool" value="false"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="183" name="enemy" type="bit01" x="1312" y="960">
+   <properties>
+    <property name="vertical" type="bool" value="false"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="184" name="enemy" type="bit01" x="1312" y="992">
+   <properties>
+    <property name="vertical" type="bool" value="false"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="185" name="enemy" type="bit01" x="1312" y="1024">
+   <properties>
+    <property name="vertical" type="bool" value="false"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="186" name="enemy" type="bit01" x="1312" y="1056">
+   <properties>
+    <property name="vertical" type="bool" value="false"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="187" name="enemy" type="bit02" x="560" y="1456">
+   <point/>
+  </object>
+  <object id="188" name="enemy" type="bit02" x="696" y="952">
+   <point/>
+  </object>
+  <object id="189" name="enemy" type="bit02" x="520" y="1104">
+   <point/>
+  </object>
+  <object id="202" name="enemy" type="bit01" x="736" y="768">
+   <properties>
+    <property name="vertical" type="bool" value="false"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="203" name="enemy" type="bit01" x="736" y="800">
+   <properties>
+    <property name="vertical" type="bool" value="false"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="204" name="enemy" type="bit01" x="736" y="832">
+   <properties>
+    <property name="vertical" type="bool" value="false"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="205" name="enemy" type="bit01" x="736" y="864">
+   <properties>
+    <property name="vertical" type="bool" value="false"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="207" name="consumable" type="coinBit" x="1600" y="1024" width="32" height="32"/>
+  <object id="208" name="consumable" type="coinBit" x="1440" y="1248" width="32" height="32"/>
+  <object id="209" name="consumable" type="coinBit" x="2016" y="1648" width="32" height="32"/>
+  <object id="210" name="consumable" type="coinBit" x="2016" y="1704" width="32" height="32"/>
+  <object id="211" name="consumable" type="coinBit" x="2912" y="1112" width="32" height="32"/>
+  <object id="212" name="consumable" type="coinBit" x="2968" y="1112" width="32" height="32"/>
+  <object id="213" name="consumable" type="coinBit" x="3024" y="1112" width="32" height="32"/>
+  <object id="214" name="consumable" type="coinBit" x="2224" y="1472" width="32" height="32"/>
+  <object id="215" name="consumable" type="coinBit" x="2224" y="1528" width="32" height="32"/>
+  <object id="216" name="consumable" type="coinBit" x="3112" y="64" width="32" height="32"/>
+  <object id="217" name="consumable" type="coinBit" x="3056" y="64" width="32" height="32"/>
+  <object id="218" name="consumable" type="coinBit" x="3000" y="64" width="32" height="32"/>
+  <object id="219" name="consumable" type="coinBit" x="2944" y="64" width="32" height="32"/>
  </objectgroup>
 </map>

@@ -5,7 +5,6 @@ pygame.init()
 import os
 import random
 import sys
-
 from camera import *
 from enemy import *
 from fx import *
@@ -15,10 +14,10 @@ from overlay import *
 from player import *
 from sfx import *
 from stgs import *
+import colors
 
 loadSave(saveFile)
 from stgs import *
-
 
 #### Game object ####
 class game:
@@ -168,7 +167,6 @@ class game:
 
     def update(self): 
         self.getFps()
-        self.getFullScreen()
         self.getPause()
         if self.pause:
             self.pSprites.update()
@@ -177,7 +175,6 @@ class game:
             self.sprites.update()
             self.checkHits()
         self.cam.update(self.player)
-        
         self.render()
 
         
@@ -196,6 +193,10 @@ class game:
         for fx in self.fxLayer:
             self.win.blit(fx.image, fx.rect)
         
+        self.win.blit(transparentRect((winWidth, 60), 120), (0, 0))
+        visPoints = fonts['6'].render("Score: " + str(self.points), self.antialiasing, (255, 255, 255))
+        self.win.blit(visPoints, (100, 20))
+
         for sprite in self.overlayer:
             self.win.blit(sprite.image, sprite.rect)
         
@@ -204,9 +205,6 @@ class game:
             fpsText = fonts['6'].render(str(self.currentFps), self.antialiasing, (255, 255, 255))
             self.win.blit(fpsText, (1100, 5))
         
-        self.win.blit(transparentRect((125, 35), 100), (90, 22))
-        visPoints = fonts['6'].render("Score: " + str(self.points), self.antialiasing, (255, 255, 255))
-        self.win.blit(visPoints, (100, 20))
 
     def checkHits(self):
         ### Checks for bullet collision among enemies and bullets
@@ -314,9 +312,10 @@ class game:
                         self.fullScreen = False
                     else:
                         self.quit()
+        self.getFullScreen()
 
     def getFps(self):
-        self.currentFps = self.clock.get_fps() 
+        self.currentFps = round(self.clock.get_fps(), 1)
         return self.currentFps
     
     def toggleFps(self):
@@ -368,50 +367,132 @@ class game:
 
     #### First menu loop ####
     def menuLoop(self):
-        run = True
-        startButton = button(self, (winWidth/2, 100), text="Start", center = True)
-        loadCustomLevelBtn = button(self, (winWidth/2, 180), text="Load Custom Level (web)", center = True)
-        loadCustomLevelBtn2 = button(self, (winWidth/2, 260), text="Load Custom Level (file)", center = True)
-        #slider1 = settingSlider(self, (800, 600)) 
-        comps = pygame.sprite.Group(startButton, loadCustomLevelBtn, loadCustomLevelBtn2) # Stands for components fyi
-        while run:
-            pygame.time.delay(50)
-            
-            self.runEvents()
-            self.refresh()
+        def dipMenu():
+            returnButton = button(self, (winWidth/2, 100), text="Return", center = True)
+            slider1 = settingSlider(self, (800, 600)) 
+            comps = pygame.sprite.Group(returnButton, slider1)
+            while True:
+                pygame.time.delay(50)
+                
+                self.runEvents()
+                self.refresh()
 
-            comps.update()
-            for comp in comps:
-                self.win.blit(comp.image, comp.rect)
+                comps.update()
+                for comp in comps:
+                    self.win.blit(comp.image, comp.rect)
 
-            if startButton.clicked:
-                self.loadLevel(1)
-                break
-            
-            if loadCustomLevelBtn.clicked:
-                self.loadLevel(None, pyperclip.paste())
-                break
+                if returnButton.clicked:
+                    break
 
-            if loadCustomLevelBtn2.clicked:
-                self.loadLevel(None, None)
-                break
-            
-            text1 = self.font2.render('Press S to Start', self.antialiasing, (50, 255, 255))
-            text2 = self.font1.render('Welcome to Cyber Space', self.antialiasing, (50, 255, 255))
-            text3 = self.font1.render('Created by Luke Gonsalves', self.antialiasing, (50, 255, 255))
-            
-            self.win.blit(text1, (30,30))
-            self.win.blit(text2, (100, 200))
-            self.win.blit(text3, (100, 300))
+                if checkKey(keySet['start']):
+                    self.loadLevel(1)
+                    break
+                
+                text2 = fonts['1'].render('Cyber Space', self.antialiasing, (50, 255, 255))
+                self.win.blit(text2, (30,30))
 
-            keys = pygame.key.get_pressed()
+                keys = pygame.key.get_pressed()
+                
+                pygame.display.update()
+        
+        def settingsMenu():
+            returnButton = button(self, (winWidth-240, 70), text="Return", center = True)
+            comps = pygame.sprite.Group(returnButton)
+            audioSlider1 = settingSlider(self, (100, 350), addGroups = [comps])
+            audioSlider2 = settingSlider(self, (100, 500), addGroups = [comps])
+            audioSlider1.image.set_colorkey((0,0,0))
+            audioSlider2.image.set_colorkey((0,0,0))
+            fpsButton = button(self, (800, 250), text = 'Toggle FPS', onClick = lambda:self.toggleFps() ,addGroups = [comps], center = True)
+            aaliasButton = button(self, (800, 330), text = 'Toggle Anti - Aliasing', onClick = lambda:self.toggleAalias() ,addGroups = [comps], center = True)
+            texts = [
+                text('5', 'Paused', colors.cyan, self.antialiasing, (winWidth/2.4, 10)),
+                text('1', 'Audio Control', colors.cyan, self.antialiasing, (75, 250)),
+                text('6', 'Music Volume', colors.cyan, self.antialiasing, (75, 325)),
+                text('6', 'Fx Volume', colors.cyan, self.antialiasing, (75, 475))
+            ]
+            def applyComps():
+                self.mixer.setMusicVolume(audioSlider1.get_ratio())
+                self.mixer.setFxVolume(audioSlider2.get_ratio())
 
-            if keys[keySet['start']]:
-                self.loadLevel(1)
-                break
-            
-            pygame.display.update()
+            audioSlider1.setRatio(self.mixer.musicVolume)
+            audioSlider2.setRatio(self.mixer.fxVolume)
 
+            while True:
+                pygame.time.delay(50)
+                
+                self.runEvents()
+                self.refresh()
+                applyComps()
+
+                comps.update()
+                for comp in comps:
+                    self.win.blit(comp.image, comp.rect)
+
+                for t in texts:
+                    self.win.blit(t.rend, t.pos)
+
+                if returnButton.clicked:
+                    break
+
+                if checkKey(keySet['start']):
+                    self.loadLevel(1)
+                    break
+                
+                text2 = fonts['1'].render('Cyber Space', self.antialiasing, (50, 255, 255))
+                self.win.blit(text2, (30,30))
+
+                keys = pygame.key.get_pressed()
+                
+                pygame.display.update()
+
+        def main():
+            startButton = button(self, (winWidth/2, 100), text="Start", center = True)
+            dipButton = button(self, (50, winHeight-120), text="Settings", center=True)
+            loadCustomLevelBtn = button(self, (winWidth/2, 180), text="Load Custom Level (web)", center = True)
+            loadCustomLevelBtn2 = button(self, (winWidth/2, 260), text="Load Custom Level (file)", center = True)
+            comps = pygame.sprite.Group(startButton, loadCustomLevelBtn, loadCustomLevelBtn2, dipButton) # Stands for components fyi
+            while True:
+                pygame.time.delay(50)
+                
+                self.runEvents()
+                self.refresh()
+
+                comps.update()
+                for comp in comps:
+                    self.win.blit(comp.image, comp.rect)
+
+                if startButton.clicked:
+                    self.loadLevel(1)
+                    break
+                
+                if loadCustomLevelBtn.clicked:
+                    self.loadLevel(None, pyperclip.paste())
+                    break
+
+                if loadCustomLevelBtn2.clicked:
+                    self.loadLevel(None, None)
+                    break
+                
+                if dipButton.clicked:
+                    settingsMenu()
+                    dipButton.reset()
+                
+                text1 = self.font2.render('Press S to Start', self.antialiasing, (50, 255, 255))
+                text2 = self.font1.render('Welcome to Cyber Space', self.antialiasing, (50, 255, 255))
+                text3 = self.font1.render('Created by Luke Gonsalves', self.antialiasing, (50, 255, 255))
+                
+                self.win.blit(text1, (30,30))
+                self.win.blit(text2, (100, 200))
+                self.win.blit(text3, (100, 300))
+
+                keys = pygame.key.get_pressed()
+
+                if keys[keySet['start']]:
+                    self.loadLevel(1)
+                    break
+                
+                pygame.display.update()
+        main()
 
     def victoryLoop(self):
         menuButton = button(self, (winWidth/2, winHeight/2), text="Back to Menu", center = True, colors = (colors.yellow, colors.white))
@@ -431,7 +512,9 @@ class game:
                 break
             
             text1 = self.victoryFont.render('Victory', self.antialiasing, colors.yellow, 20)
+            text2 = fonts['1'].render("Score: " + str(self.points), self.antialiasing, (colors.yellow))
             
+            self.win.blit(text2, (800, 70))
             self.win.blit(text1, (winWidth/2 - text1.get_width()/2 ,30))
             
             pygame.display.update()
@@ -454,8 +537,10 @@ class game:
                 break
             
             text1 = self.gameOverFont.render('Game Over', self.antialiasing, colors.dark(colors.red, 20))
+            text2 = fonts['1'].render("Score: " + str(self.points), self.antialiasing, (colors.yellow))
             
             self.win.blit(text1, (50,50))
+            self.win.blit(text2, (800, 70))
             
             pygame.display.update()
 

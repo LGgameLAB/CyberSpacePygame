@@ -183,20 +183,22 @@ class megaTurret(enemy):
     # Pleas be careful when aligning the animation with the firing - Luke Mistake 20201
     def __init__(self, game, pos, vertical):
         imgSheet = {'tileWidth': 128, 'r': asset('enemies/megaTurret.png'), 'l': asset('enemies/megaTurret.png')} # Animation Sheet
-        startDir = pygame.Vector2(1, 0).rotate(45)
+        startDir = pygame.Vector2(1, 0).rotate(25)
 
-        super().__init__(game, pos, health = 8, imgSheet = imgSheet, startDir = startDir, groups = (game.sprites, game.enemies, game.layer2, game.colliders))
+        super().__init__(game, pos, health = 8, imgSheet = imgSheet, startDir = startDir, groups = (game.sprites, game.enemies, game.layer2, ))#game.colliders))
         self.animations.delay = 90*6
+        self.animations.frameReset = False
         self.fireAngle = 90
         self.fireDelay = 90*4
         self.lastFire = -self.fireDelay
-        self.animations.framex += random.randint(0,8)*64
+        self.animations.framex += random.randint(0,8)*128
         self.width = 100
         self.height = 100
-    
+        self.vel = 10
+
     def update(self): 
         super().update()
-        self.fireAngle = ((self.animations.framex/self.animations.tileWidth)/8)*360
+        self.fireAngle = ((self.animations.framex/self.animations.tileWidth)/8)*360 - 90
         if pygame.time.get_ticks() - self.lastFire >= self.fireDelay:
             self.fire()
             self.lastFire = pygame.time.get_ticks()
@@ -225,12 +227,12 @@ class megaTurret(enemy):
         
         self.pos.x += self.dir.x*self.vel
         # If we hit player move the player
-        testRect = pygame.Rect(self.pos.x, self.pos.y, self.rect.width, self.rect.height)
-        if testRect.colliderect(self.player.rect):
-            if self.dir.x < 0:
-                self.player.rect.right = testRect.left
-            else:
-                self.player.rect.left = testRect.right
+        # testRect = pygame.Rect(self.pos.x, self.pos.y, self.rect.width, self.rect.height)
+        # if testRect.colliderect(self.player.rect):
+        #     if self.dir.x < 0:
+        #         self.player.rect.right = testRect.left
+        #     else:
+        #         self.player.rect.left = testRect.right
 
         if self.collideCheck(pygame.Vector2(testVec.x, testVec.y+(self.dir.y*self.vel))):
             if self.dir.y > 0:
@@ -239,12 +241,13 @@ class megaTurret(enemy):
                 self.dir = self.dir.reflect((0, 1))
         
         self.pos.y += self.dir.y*self.vel
-        testRect = pygame.Rect(self.pos.x, self.pos.y, self.rect.width, self.rect.height)
-        if testRect.colliderect(self.player.rect):
-            if self.dir.y < 0:
-                self.player.rect.bottom = self.rect.top
-            else:
-                self.player.rect.top = self.rect.bottom
+        # And again move the player on collision
+        # testRect = pygame.Rect(self.pos.x, self.pos.y, self.rect.width, self.rect.height)
+        # if testRect.colliderect(self.player.rect):
+        #     if self.dir.y < 0:
+        #         self.player.rect.bottom = self.rect.top
+        #     else:
+        #         self.player.rect.top = self.rect.bottom
 
     def collideCheck(self, vector):
             returnVal = False
@@ -269,7 +272,7 @@ class bit02(enemy):
     def move(self):
         testVec = pygame.Vector2((self.pos.x, self.pos.y))
         if self.collideCheck(pygame.Vector2(testVec.x+(self.dir.x*self.vel), testVec.y)):
-            
+
             if self.dir.x > 0:
                 self.dir = self.dir.reflect((-1,0))
             else:
