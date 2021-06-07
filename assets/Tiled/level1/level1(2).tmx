@@ -70,9 +70,9 @@
   </object>
   <object id="25" name="text" x="112" y="48" width="1152" height="51">
    <properties>
-    <property name="text" value="Find the Decryptor and bring it to the white NET Gate to navigate the Cyber Realm!"/>
+    <property name="text" value="Find the Decryptor and bring it to the CyberNET Gate to navigate the Cyber Realm!"/>
    </properties>
-   <text fontfamily="Myanmar Text" pixelsize="33" wrap="1" color="#ffffff">Find the Decryptor and bring it to the white NET Gate to navigate the Cyber Realm!</text>
+   <text fontfamily="Myanmar Text" pixelsize="33" wrap="1" color="#ffffff">Find the Decryptor and bring it to the CyberNET Gate to navigate the Cyber Realm!</text>
   </object>
   <object id="27" name="key" x="1696" y="576">
    <properties>

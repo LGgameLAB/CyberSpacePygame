@@ -13,6 +13,7 @@ cyan = (50, 255, 255)
 red = (200, 0, 0)
 lightRed = (255, 100, 100)
 purple = (102, 0, 102)
+orangeRed = (255,69,0)
 
 
 def dark(color, *args):

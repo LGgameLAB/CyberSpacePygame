@@ -7,6 +7,7 @@ import pygame
 from animations import *
 from objects import *
 from stgs import *
+import fx
 
 
 #### Player object ####
@@ -20,7 +21,7 @@ class player(pygame.sprite.Sprite):
     roomBound = False
     imgSheet = {'active': False, 'tileWidth': 64, 'r': False, 'l': False, 'idleR': False, 'flyR': False, 'flyL': False}
     width, height = 36, 64
-    health = 50
+    health = 5000
     maxHp = 50
     #### Player Initializations ####
     def __init__(self, game, image, name, **kwargs):
@@ -43,6 +44,9 @@ class player(pygame.sprite.Sprite):
         self.loadAnimations()
         self.hpBar = healthBar(self.game, self)
         self.coinMeter = coinMeter(self.game, self)
+        self.particleFx = fx.particles(self.game, self.rect, size = 15, dirRange=(55, 115))
+        self.particleFx.setParticleKwargs(color=colors.cyan, speed=5, shrink=0.6)
+        self.mascara = pygame.mask.from_surface(self.image)
 
     def loadAnimations(self):
         self.animations = animation(self)   
@@ -51,8 +55,11 @@ class player(pygame.sprite.Sprite):
     def update(self):
         self.move()
         self.animations.update()
-        #print(self.animations.dir)
-    
+        if self.ground:
+            self.particleFx.hide = True
+        else:
+            self.particleFx.hide = False
+        
     def takeDamage(self, damage):
         if pygame.time.get_ticks() - self.lastHit >= self.hitCooldown:
             self.health -= damage

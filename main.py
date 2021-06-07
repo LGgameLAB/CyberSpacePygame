@@ -40,7 +40,10 @@ class game:
         self.mixer.setFxVolume(fxVolume)
         self.antialiasing = aalias
 
+        pygame.display.set_icon(pygame.image.load(asset('logo.png')))
         self.win = pygame.display.set_mode((winWidth, winHeight))
+        pygame.display.set_caption("Cyber Space")
+        pygame.display.set_icon(pygame.image.load(asset('logo.png')))
         self.font1 = pygame.font.Font(os.path.join('fonts', 'YuseiMagic-Regular.ttf'), 30)
         self.font2 = pygame.font.SysFont('Comic Sans MS', 23)
         self.menuFont = pygame.font.Font(os.path.join('fonts', 'YuseiMagic-Regular.ttf'), 15)
@@ -226,7 +229,10 @@ class game:
         for hit in hits:
             self.player.takeDamage(hit.damage)
 
-        pygame.sprite.groupcollide(self.colliders, self.pBullets, False, True)
+        hits = pygame.sprite.groupcollide(self.pBullets, self.colliders, True, False)
+        for hit in hits:
+            particles(self, hit.rect, lifeSpan = 300, tickSpeed=2, size = 5).setParticleKwargs(speed=1.5, shrink=0.6, life=140, color=colors.orangeRed)
+        
         pygame.sprite.groupcollide(self.colliders, self.eBullets, False, True)
 
         items = pygame.sprite.spritecollide(self.player, self.items, True)
@@ -262,7 +268,10 @@ class game:
             fadeOut(self, speed = 8, alpha = 40, onEnd = lambda:self.nextLevel())
         
         if self.player.health <= 0:
-            self.end = True
+            self.pause = True
+            def end():
+                self.end = True
+            fadeOut(self, speed = 2, alpha = 40, color = colors.dark(colors.red, 60), noKill = True, onEnd = lambda:end())
 
     def unPause(self):
         self.pause = False
@@ -335,12 +344,14 @@ class game:
     def getFullScreen(self):
         keys = pygame.key.get_pressed()
         if keys[keySet['fullScreen']]:
+            pygame.display.set_icon(pygame.image.load(asset('logo.png')))
             if self.fullScreen:
                 self.win = pygame.display.set_mode((winWidth, winHeight))
                 self.fullScreen = False
             else:
                 self.win = pygame.display.set_mode((winWidth, winHeight), pygame.FULLSCREEN)
                 self.fullScreen = True
+            pygame.display.set_icon(pygame.image.load(asset('logo.png')))
             #pygame.display.toggle_fullscreen()
 
     def getPause(self):

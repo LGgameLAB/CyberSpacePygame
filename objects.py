@@ -1,7 +1,9 @@
 import pygame
 from stgs import *
 from animations import *
+import fx
 import math
+import colors
 
 def activatePlatform(game, platformId):
     game.getSprBylID(platformId).pause = False
@@ -197,12 +199,11 @@ class key(pygame.sprite.Sprite):
 class coin(pygame.sprite.Sprite):
     color = (255, 255, 255)
     value = 10
-    imgSheet = {'active': False, 'static': True,'tileWidth': 32}
 
     def __init__(self, game, pos, image, **kwargs):
         self.groups = game.sprites, game.layer1, game.items
         pygame.sprite.Sprite.__init__(self, self.groups)
-
+        self.imgSheet = {'active': True, 'tileWidth': 32, 'r': asset('objects/bitcoin(2).png')}
         for k, v in kwargs.items():
             self.__dict__[k] = v
 
@@ -446,6 +447,7 @@ class gun(pygame.sprite.Sprite):
     def fire(self, mPos):
         bullet(self.game, self.rect.center, mPos, self.angle)
         self.game.mixer.playFx('gunFx1')
+                
 
     def setAngle(self, *args):
         if len(args) > 0:
@@ -554,6 +556,9 @@ class bullet(pygame.sprite.Sprite):
         self.image = pygame.transform.rotate(self.image, angle - self.offset)
         self.rect = pygame.Rect(0, 0, self.image.get_width(), self.image.get_height())
         self.rect.center = self.pos
+        ## If you were thinking this should be on the then well . . . I did it here to be more precise
+        fx.particles(self.game, self.rect, lifeSpan = 100, tickSpeed=20, size = 8).setParticleKwargs(speed=1.5, shrink=0.4, life=140, color=colors.orangeRed)
+
     
     def update(self):
         if not self.static:
@@ -661,7 +666,7 @@ class coinMeter(consumable):
             self.player.maxHp = round(self.player.maxHp*1.04)
             self.player.health += self.player.maxHp*self.healthAddPerc
             self.player.health = min(self.player.maxHp, self.player.health)
-        print(self.player.maxHp)
+        # print(self.player.maxHp)
 
 class lazer(bullet):
     def __init__(self, game, pos, target, angle):

@@ -55,14 +55,14 @@ def checkKey(move):
 #### Method works well however you have to set the black color (0,0,0) as the transparent color key in order to make the surface see through
 class Spritesheet:
     # utility class for loading and parsing spritesheets
-    def __init__(self, file, *args):
+    def __init__(self, filePath, *args):
         if len(args) > 0:
             if args[0]:
-                self.image = file
+                self.image = filePath
             else:
-                self.image = pygame.image.load(file)
+                self.image = pygame.image.load(filePath)
         else:
-            self.image = pygame.image.load(file)
+            self.image = pygame.image.load(filePath)
         
         self.width = self.image.get_width()
         self.height = self.image.get_height()

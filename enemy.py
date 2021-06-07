@@ -5,6 +5,8 @@ from stgs import *
 from animations import *
 from player import *
 from objects import *
+import fx
+import colors
 
 class enemy(pygame.sprite.Sprite):
     pos = pygame.Vector2((0, 0))
@@ -88,6 +90,10 @@ class bit01(enemy):
                     returnVal = True
         
         return returnVal
+    
+    def kill(self):
+        fx.particles(self.game, self.rect, lifeSpan = 400, tickSpeed=2, size = 12).setParticleKwargs(speed=1.5, shrink=0.4, life=140, color=colors.lightGreen)
+        super().kill()
 
         
 
@@ -175,6 +181,10 @@ class turret1(enemy):
                 if testRect.colliderect(obj.rect):
                     returnVal = True
             return returnVal
+
+    def kill(self):
+        fx.particles(self.game, self.rect, lifeSpan = 400, tickSpeed=2, size = 14).setParticleKwargs(speed=1.5, shrink=0.4, life=140, color=colors.red)
+        super().kill()
 
 class megaTurret(enemy):
     # Okay PLEASE READ THIS WHEN DEALING WITH THIS SPRITE:
@@ -268,6 +278,7 @@ class bit02(enemy):
         vel = 10
         startDir = pygame.Vector2(1, 0).rotate(random.randint(1, 360))
         super().__init__(game, pos, health = 5, imgSheet = imgSheet, vel = vel, startDir = startDir)
+        self.points = 10
 
     def move(self):
         testVec = pygame.Vector2((self.pos.x, self.pos.y))
@@ -298,16 +309,21 @@ class bit02(enemy):
                     returnVal = True
         
         return returnVal
+    
+    def kill(self):
+        fx.particles(self.game, self.rect, lifeSpan = 400, tickSpeed=2, size = 14).setParticleKwargs(speed=1.5, shrink=0.4, life=140, color=colors.red)
+        super().kill()
 
 class bossyBit(enemy):
     def __init__(self, game, pos):
-        imgSheet = {'tileWidth': 128, 'r': asset('enemies/alien.png')}
+        imgSheet = {'tileWidth': 128, 'r': asset('enemies/bossyBit.png')}
         vel = 5
         startDir = pygame.Vector2(1, 0)
         super().__init__(game, pos, health = 30, imgSheet = imgSheet, vel = vel, startDir = startDir)
 
         self.reloadTime = 1000
         self.lastFire = pygame.time.get_ticks()
+        self.points = 30
 
     def move(self):
         testVec = pygame.Vector2((self.pos.x, self.pos.y))

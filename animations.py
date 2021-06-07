@@ -19,7 +19,7 @@ class animation:
     def loadSheet(self):
         self.imgSheet = self.sprite.imgSheet
         for k, v in self.imgSheet.items():
-            if not k == 'active' and not k == 'tileWidth' and not k == 'tileHeight':
+            if not k == 'active' and not k == 'tileWidth' and not k == 'tileHeight' and not k == 'static':
                 self.imgSheet[k] = Spritesheet(v)
         
         self.tileWidth = self.imgSheet['tileWidth']
@@ -50,7 +50,10 @@ class animation:
             self.tileHeight = self.tileWidth
         
     def update(self):
-        self.getStrDir()
+        try:
+            self.getStrDir()
+        except AttributeError:
+            self.dir = 'r'
 
         if pygame.time.get_ticks() - self.lastTick >= self.delay:
             self.framex += self.tileWidth
