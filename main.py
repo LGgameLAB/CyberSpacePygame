@@ -14,6 +14,7 @@ from overlay import *
 from player import *
 from sfx import *
 from stgs import *
+from menu import *
 import colors
 
 loadSave(saveFile)
@@ -405,7 +406,49 @@ class game:
                 keys = pygame.key.get_pressed()
                 
                 pygame.display.update()
-        
+
+        def compendiumMenu():
+            x, y = 100, 100
+            stepX, stepY = 120, 120
+            returnButton = button(self, (winWidth-240, 70), text="Return", center = True)
+            #menuItem(self, (x, y), asset(''), desc='', text=''),
+            itemCompendium = [
+                menuItem(self, (x, y), asset('objects/gun.png'), desc='The Standard Blaster', text='Cyber Blaster'),
+                menuItem(self, (x+stepX, y), asset('objects/gun.png'), desc='The Standard Blaster X3 -- THREE TIMES THE POWER', text='Cyber Blaster'),
+                menuItem(self, (x+stepX*2, y), asset('objects/lazgun.png'), desc='The Standard Blaster X3 -- THREE TIMES THE POWER', text='Cyber Blaster'),
+            ]
+            comps = pygame.sprite.Group(itemCompendium, returnButton)
+            while True:
+                descText = ''
+                pygame.time.delay(50)
+                
+                self.runEvents()
+                self.refresh()
+
+                comps.update()
+                for comp in comps:
+                    self.win.blit(comp.image, comp.rect)
+
+                for i in itemCompendium:
+                    if i.hover:
+                        descText = i.desc
+
+                if returnButton.clicked:
+                    break
+
+                if checkKey(keySet['start']):
+                    self.loadLevel(1)
+                    break
+                
+                text1 = fonts['1'].render('Cyber Space', self.antialiasing, (50, 255, 255))
+                text2 = fonts['2'].render(descText, self.antialiasing, (50, 255, 255))
+                self.win.blit(text1, (30,winHeight - 70))
+                self.win.blit(text2, (winWidth- 1200,winHeight - 240))
+
+                keys = pygame.key.get_pressed()
+                
+                pygame.display.update()
+
         def settingsMenu():
             returnButton = button(self, (winWidth-240, 70), text="Return", center = True)
             comps = pygame.sprite.Group(returnButton)
@@ -459,14 +502,15 @@ class game:
         def main():
             startButton = button(self, (winWidth/2, 100), text="Start", center = True)
             dipButton = button(self, (50, winHeight-120), text="Settings", center=True)
+            compendButton = button(self, (275, winHeight-120), text="Item Compendium", center=True)
             loadCustomLevelBtn = button(self, (winWidth/2, 180), text="Load Custom Level (web)", center = True)
             loadCustomLevelBtn2 = button(self, (winWidth/2, 260), text="Load Custom Level (file)", center = True)
-            comps = pygame.sprite.Group(startButton, loadCustomLevelBtn, loadCustomLevelBtn2, dipButton) # Stands for components fyi
+            comps = pygame.sprite.Group(startButton, loadCustomLevelBtn, loadCustomLevelBtn2, dipButton, compendButton) # Stands for components fyi
             while True:
                 pygame.time.delay(50)
                 
                 self.runEvents()
-                self.refresh()
+                self.refresh(asset('objects/genBg/genBg/Nether.jpg'))
 
                 comps.update()
                 for comp in comps:
@@ -488,9 +532,13 @@ class game:
                     settingsMenu()
                     dipButton.reset()
                 
+                if compendButton.clicked:
+                    compendiumMenu()
+                    compendButton.reset()
+                
                 text1 = self.font2.render('Press S to Start', self.antialiasing, (50, 255, 255))
                 text2 = self.font1.render('Welcome to Cyber Space', self.antialiasing, (50, 255, 255))
-                text3 = self.font1.render('Created by Luke Gonsalves', self.antialiasing, (50, 255, 255))
+                text3 = self.font1.render('Created by LGgameLAB', self.antialiasing, (50, 255, 255))
                 
                 self.win.blit(text1, (30,30))
                 self.win.blit(text2, (100, 200))
@@ -503,6 +551,7 @@ class game:
                     break
                 
                 pygame.display.update()
+        
         main()
 
     def victoryLoop(self):
@@ -555,7 +604,9 @@ class game:
             
             pygame.display.update()
 
-    def refresh(self):
+    def refresh(self, bg = False):
+        if bg:
+            self.win.blit(pygame.transform.scale(pygame.image.load(bg), (winWidth, winHeight)), (0, 0))
         self.win.fill((0, 0, 0))
 
 #### Creates and runs game ####

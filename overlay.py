@@ -1,7 +1,7 @@
 import pygame
 import colors
 from stgs import *
-from objects import *
+from menu import *
 
 pygame.font.init()
 class text:
