@@ -21,8 +21,9 @@ class player(pygame.sprite.Sprite):
     roomBound = False
     imgSheet = {'active': False, 'tileWidth': 64, 'r': False, 'l': False, 'idleR': False, 'flyR': False, 'flyL': False}
     width, height = 36, 64
-    health = 5000
+    health = 50
     maxHp = 50
+    maxLives = 3
     #### Player Initializations ####
     def __init__(self, game, image, name, **kwargs):
         self.groups = [game.sprites, game.layer2]
@@ -37,6 +38,7 @@ class player(pygame.sprite.Sprite):
         self.yMod = 0
         self.ground = False
         self.gun = standardGun(self.game, self)
+        self.lives = self.maxLives
 
         for k, v in kwargs.items():
             self.__dict__[k] = v
@@ -47,6 +49,7 @@ class player(pygame.sprite.Sprite):
         self.particleFx = fx.particles(self.game, self.rect, size = 15, dirRange=(55, 115))
         self.particleFx.setParticleKwargs(color=colors.cyan, speed=5, shrink=0.6)
         self.mascara = pygame.mask.from_surface(self.image)
+                
 
     def loadAnimations(self):
         self.animations = animation(self)   
@@ -65,6 +68,7 @@ class player(pygame.sprite.Sprite):
             self.health -= damage
             self.lastHit = pygame.time.get_ticks()
             self.game.mixer.playFx('pHit')
+
     #### Move Physics ####
     def move(self):
         self.dir = pygame.math.Vector2((0, 0))

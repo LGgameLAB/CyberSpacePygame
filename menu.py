@@ -7,25 +7,23 @@ class button(pygame.sprite.Sprite):
         
         self.onClick = False
         self.groups = []
-        self.addGroups = []
         self.rect = (0, 0, 200, 60)
         #          Normal           Selected
         self.colors = ((50, 255, 255), (255, 255, 255))
         self.spriteInit = False
         self.hover = False
         self.clicked = False
+        self.instaKill = False
         self.text = ''
         self.center = False
         for k, v in kwargs.items():
             self.__dict__[k] = v
-        
-        self.groups = self.groups + self.addGroups
 
         pygame.sprite.Sprite.__init__(self, self.groups)
 
         self.rect = pygame.Rect(self.rect)
         self.rect.x, self.rect.y = pos
-        self.image = pygame.Surface(self.rect.size)
+        self.image = pygame.Surface(self.rect.size, pygame.SRCALPHA)
 
         self.rendText = self.game.menuFont.render(self.text, self.game.antialiasing, (0, 0, 0))
         self.textRect = self.rendText.get_rect()
@@ -49,6 +47,8 @@ class button(pygame.sprite.Sprite):
                     self.clicked = True
                     if self.onClick:
                         self.onClick()
+                        if self.instaKill:
+                            self.kill()
 
             self.image.fill(self.colors[1])
         else:

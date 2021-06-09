@@ -15,6 +15,7 @@ class fadeOut(pygame.sprite.Sprite):
         self.game = game
         self.onEnd = False
         self.noKill = False
+        self.ended = False
         self.color = (0, 0, 0)
         for k, v in kwargs.items():
             self.__dict__[k] = v
@@ -34,13 +35,14 @@ class fadeOut(pygame.sprite.Sprite):
             if self.fadeBack:
                 fadeIn(self.game)
             self.end()
+            self.ended = True
         else:
             self.alpha += self.speed
 
         self.image.set_alpha(self.alpha)
 
     def end(self):   
-        if self.onEnd:
+        if self.onEnd and not self.ended:
             self.onEnd()
         if not self.noKill:
             self.kill()

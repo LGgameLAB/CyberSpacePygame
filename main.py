@@ -130,10 +130,10 @@ class game:
             
             self.cam.width, self.cam.height = self.level.rect.width, self.level.rect.height
             
-            try:
-                self.player.rect.topleft = self.level.entrance.rect.center
-            except:
-                print("No player Pos")
+            #try:
+            self.player.rect.topleft = self.level.entrance.rect.center
+            # except:
+            #     print("No player Pos")
             
 
         else:
@@ -199,7 +199,9 @@ class game:
         
         self.win.blit(transparentRect((winWidth, 60), 120), (0, 0))
         visPoints = fonts['6'].render("Score: " + str(self.points), self.antialiasing, (255, 255, 255))
-        self.win.blit(visPoints, (100, 20))
+        visLives = fonts['2'].render("Lives: " + str(self.player.lives), self.antialiasing, (255, 255, 255))
+        self.win.blit(visPoints, (100, 15))
+        self.win.blit(visLives, (700, 15))
 
         for sprite in self.overlayer:
             self.win.blit(sprite.image, sprite.rect)
@@ -268,11 +270,34 @@ class game:
             self.pause = True
             fadeOut(self, speed = 8, alpha = 40, onEnd = lambda:self.nextLevel())
         
-        if self.player.health <= 0:
-            self.pause = True
-            def end():
-                self.end = True
-            fadeOut(self, speed = 2, alpha = 40, color = colors.dark(colors.red, 60), noKill = True, onEnd = lambda:end())
+        if self.player.health <= 0 and not self.pause:
+            self.player.lives -= 1
+            if self.player.lives <= 0:
+                def endF():
+                    self.end = True
+                self.pause = True
+                fadeOut(self, speed = 2, alpha = 40, color = colors.dark(colors.red, 60), noKill = True, onEnd = endF)
+            else:
+                self.pause = True
+                fadeOut(self, speed = 2, alpha = 40, color = colors.dark(colors.red, 60), noKill = True, onEnd = self.died)
+
+    def cont(self):
+        self.pause = False
+        self.loadLevel(self.getLvlNum())
+        self.player.health = self.player.maxHp
+        self.fxLayer.empty()
+        for s in self.pSprites:
+            s.kill()
+
+    def died(self):
+        button(self, (400, 400), groups = [self.pSprites, self.overlayer], text = "Continue", onClick=self.cont, instaKill = True, center = True, colors = (colors.cyan, colors.white))
+        def end():
+            self.end = True
+        button(self, (400, 500), groups = [self.pSprites, self.overlayer], text = "Return to menu", onClick=end, instaKill = True, center = True, colors = (colors.cyan, colors.white))
+        
+
+    def getLvlNum(self, offSet=0):
+        return self.levels.index(self.level) + 1 + offSet
 
     def unPause(self):
         self.pause = False
@@ -459,8 +484,8 @@ class game:
             audioSlider2 = settingSlider(self, (100, 500), addGroups = [comps])
             audioSlider1.image.set_colorkey((0,0,0))
             audioSlider2.image.set_colorkey((0,0,0))
-            fpsButton = button(self, (800, 250), text = 'Toggle FPS', onClick = lambda:self.toggleFps() ,addGroups = [comps], center = True)
-            aaliasButton = button(self, (800, 330), text = 'Toggle Anti - Aliasing', onClick = lambda:self.toggleAalias() ,addGroups = [comps], center = True)
+            fpsButton = button(self, (800, 250), text = 'Toggle FPS', onClick = lambda:self.toggleFps() ,groups = [comps], center = True)
+            aaliasButton = button(self, (800, 330), text = 'Toggle Anti - Aliasing', onClick = lambda:self.toggleAalias() ,groups = [comps], center = True)
             texts = [
                 text('5', 'Paused', colors.cyan, self.antialiasing, (winWidth/2.4, 10)),
                 text('1', 'Audio Control', colors.cyan, self.antialiasing, (75, 250)),
@@ -582,6 +607,7 @@ class game:
             
             pygame.display.update()
 
+
     def gameOver(self):
         restartButton = button(self, (winWidth/2, winHeight/2), text="Back to Menu", center = True, colors = (colors.yellow, colors.white))
         buttons = pygame.sprite.Group(restartButton)
@@ -598,6 +624,7 @@ class game:
             if restartButton.clicked:
                 self.reset()
                 break
+            
             
             text1 = self.gameOverFont.render('Game Over', self.antialiasing, colors.dark(colors.red, 20))
             text2 = fonts['1'].render("Score: " + str(self.points), self.antialiasing, (colors.yellow))
