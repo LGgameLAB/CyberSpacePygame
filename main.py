@@ -413,11 +413,13 @@ class game:
             returnButton = button(self, (winWidth-240, 70), text="Return", center = True)
             #menuItem(self, (x, y), asset(''), desc='', text=''),
             itemCompendium = [
-                menuItem(self, (x, y), asset('objects/gun.png'), desc='The Standard Blaster', text='Cyber Blaster'),
-                menuItem(self, (x+stepX, y), asset('objects/gun.png'), desc='The Standard Blaster X3 -- THREE TIMES THE POWER', text='Cyber Blaster'),
-                menuItem(self, (x+stepX*2, y), asset('objects/lazgun.png'), desc='The Standard Blaster X3 -- THREE TIMES THE POWER', text='Cyber Blaster'),
+                menuItem(self, (x, y), asset('objects/gun.png'), desc='The Standard Blaster -- Your first weapon.', text='Cyber Blaster'),
+                menuItem(self, (x+stepX, y), asset('objects/gun.png'), desc='The Triple Blaster -- THREE TIMES THE POWER \n Found In level 2', text='Cyber Blaster'),
+                menuItem(self, (x+stepX*2, y), asset('objects/lazgun.png'), desc='The Cyber Lazer 1 -- Incinerate your enemies with a beam that can travel through multiple enemies \n Found in level 6', text='Cyber Blaster'),
             ]
             comps = pygame.sprite.Group(itemCompendium, returnButton)
+            descText = ''
+            text2 = text('2', descText, colors.cyan, self.antialiasing, (winWidth- 1200,winHeight - 240), True)
             while True:
                 descText = ''
                 pygame.time.delay(50)
@@ -441,9 +443,10 @@ class game:
                     break
                 
                 text1 = fonts['1'].render('Cyber Space', self.antialiasing, (50, 255, 255))
-                text2 = fonts['2'].render(descText, self.antialiasing, (50, 255, 255))
+                # text2 = fonts['2'].render(descText, self.antialiasing, (50, 255, 255))
+                text2 = text('4', descText, colors.cyan, self.antialiasing, (winWidth- 1200,winHeight - 240), True)
                 self.win.blit(text1, (30,winHeight - 70))
-                self.win.blit(text2, (winWidth- 1200,winHeight - 240))
+                self.win.blit(text2.image, text2.pos)
 
                 keys = pygame.key.get_pressed()
                 
@@ -475,7 +478,7 @@ class game:
                 pygame.time.delay(50)
                 
                 self.runEvents()
-                self.refresh()
+                self.refresh(asset('objects/genBg/genBg/Nether.jpg'))
                 applyComps()
 
                 comps.update()
@@ -483,7 +486,7 @@ class game:
                     self.win.blit(comp.image, comp.rect)
 
                 for t in texts:
-                    self.win.blit(t.rend, t.pos)
+                    self.win.blit(t.image, t.pos)
 
                 if returnButton.clicked:
                     break
@@ -606,8 +609,9 @@ class game:
 
     def refresh(self, bg = False):
         if bg:
-            self.win.blit(pygame.transform.scale(pygame.image.load(bg), (winWidth, winHeight)), (0, 0))
-        self.win.fill((0, 0, 0))
+            self.win.blit(pygame.transform.scale(pygame.image.load(bg), (winWidth, winHeight)).convert(), (0, 0))
+        else:
+            self.win.fill((0, 0, 0))
 
 #### Creates and runs game ####
 game1 = game()

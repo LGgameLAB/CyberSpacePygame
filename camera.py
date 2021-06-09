@@ -8,6 +8,7 @@ class cam:
         self.width = width
         self.height = height
         self.limit = CAMLIMIT
+        self.offsetY = 40
 
     def apply(self, entity):
         return entity.rect.move(self.camera.topleft)
@@ -23,7 +24,7 @@ class cam:
         # limit scrolling to map size
         if self.limit:
             x = min(0, x)  # left
-            y = min(0, y)  # top
+            y = min(self.offsetY, y)  # top
             x = max(-(self.width - winWidth), x)  # right
             y = max(-(self.height - winHeight), y)  # bottom
 

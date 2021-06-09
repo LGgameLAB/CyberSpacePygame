@@ -5,9 +5,34 @@ from menu import *
 
 pygame.font.init()
 class text:
-    def __init__(self, fNum, text, color, aalias, pos):
-        self.rend = fonts[fNum].render(text, aalias, color)
+    def __init__(self, fNum, text, color, aalias, pos, multiline=False, size=(600, 600), bgColor=(0, 0, 0, 0)):
+        if multiline:
+            ## This code is thanks to https://stackoverflow.com/questions/42014195/rendering-text-with-multiple-lines-in-pygame 
+            self.image = pygame.Surface(size, pygame.SRCALPHA)
+            self.image.fill(bgColor)
+            font = fonts[fNum]
+            words = [word.split(' ') for word in text.splitlines()]  # 2D array where each row is a list of words.
+            space = font.size(' ')[0]  # The width of a space.
+            max_width, max_height = size
+            x, y = 0, 0
+            for line in words:
+                for word in line:
+                    if word  != '':
+                        word_surface = font.render(word, aalias, color)
+                        word_width, word_height = word_surface.get_size()
+                        if x + word_width >= max_width:
+                            x = 0  # Reset the x.
+                            y += word_height  # Start on new row.
+                        self.image.blit(word_surface, (x, y))
+                        x += word_width + space
+                x = 0 # Reset the x.
+                y += word_height  # Start on new row.
+            
+        else: 
+            self.image = fonts[fNum].render(text, aalias, color)
         self.pos = pygame.Vector2(pos)
+        
+        self.rect = (self.pos.x, self.pos.y, size[0], size[1])
     
     def __str__(self):
         return self.rend
@@ -74,5 +99,5 @@ class pauseOverlay(pygame.sprite.Sprite):
         for comp in self.components:
             self.image.blit(comp.image, comp.rect)
         for text in self.text:
-            self.image.blit(text.rend, text.pos)
+            self.image.blit(text.image, text.pos)
         
