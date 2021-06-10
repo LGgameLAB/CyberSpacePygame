@@ -5,7 +5,7 @@ import colors
 import math
 
 #### Establishes file paths ####
-PATH = os.path.dirname(os.path.abspath(__file__))
+PATH =  os.getcwd()
 ASSETSPATH = os.path.join(PATH, 'assets')
 
 #### File for saving settings in game. Every variable set here is default. Clearing the settings file should load everything as default. ####
